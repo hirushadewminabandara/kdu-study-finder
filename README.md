@@ -1,8 +1,8 @@
 # KDU StudyConnect — Academic Technical Specification & Project Documentation
 > **General Sir John Kotelawala Defence University (KDU), Sri Lanka**  
-> **Faculty of Technology (FOT) · Department of Biosystems Technology (BST)**  
-> **Bachelor of Technology (Hons) in Information and Communication Technology (ICT)**  
-> **Module:** Skill Development Project II (`ITIC1282`)  
+> **Faculty of Technology (FOT) · Department of Information and Communication Technology (DICT)**  
+> **Bachelor of Technology (Hons) in Information and Communication Technology (BTech Hons in ICT)**  
+> **Module:** Skill Development Project II (`ICT2282`)  
 > **Cohort:** Intake 43 · Group 10  
 > **Official Artifact for Academic Presentation, Lecture Viva & Defense**
 
@@ -56,7 +56,7 @@ Traditional methods for forming study syndicates rely heavily on informal WhatsA
 
 ## 2. Project Team Roster & Academic Roles
 
-**Faculty of Technology (FOT) · Department of Biosystems Technology (BST)**  
+**Faculty of Technology (FOT) · Department of Information and Communication Technology (DICT)**  
 **BTech (Hons) in ICT · Intake 43 · Group 10**
 
 ```
@@ -118,7 +118,7 @@ $$S_{\text{course}}(a, b) = \frac{|\mathcal{C}_a \cap \mathcal{C}_b|}{\min(|\mat
 
 ##### Why Min-Normalization instead of Standard Jaccard?
 Standard Jaccard similarity unfairly penalizes students with differing course loads.
-* *Example:* Student $A$ is a repeating or part-load student enrolled in 2 modules: `{ITIC1242, ITIC1260}`. Student $B$ is a full-load student enrolled in 5 modules: `{ITIC1242, ITIC1260, ITIC1282, ITIC1212, ITIC1232}`.
+* *Example:* Student $A$ is a repeating or part-load student enrolled in 2 modules: `{ICT1223, ICT1233}`. Student $B$ is a full-load student enrolled in 5 modules: `{ICT1223, ICT1233, ICT2282, ICT1213, ICT2123}`.
 * Under standard Jaccard:
   $$J(A, B) = \frac{|\{1242, 1260\}|}{|\{1242, 1260, 1282, 1212, 1232\}|} = \frac{2}{5} = 0.40 \quad (40\%)$$
   Despite Student $A$ sharing **100%** of their academic workload with Student $B$, their score is penalized.
@@ -264,7 +264,7 @@ function generateExplanation(sharedCourses, sharedSlots, catalog) {
 ```
 
 #### Example Output Rendered in Dashboard:
-> 🔍 **Why this match:** *Shares 3 modules: ITIC1282, ITIC1242, ITIC1260 · 2 common study windows (Wed Afternoon, Mon Evening)*
+> 🔍 **Why this match:** *Shares 3 modules: ICT2282, ICT1223, ICT1233 · 2 common study windows (Wed Afternoon, Mon Evening)*
 
 ---
 
@@ -326,19 +326,25 @@ graph LR
     KDU --> FMSH[Faculty of Management, Soc Sci & Hum]
     KDU --> FAHS[Faculty of Allied Health Sciences]
     KDU --> FOL[Faculty of Law]
+    KDU --> FBESS[Faculty of Built Environment & Spatial Sciences]
 
-    FOT --> BST[Dept of Biosystems Technology]
-    FOT --> ICT[Dept of Information & Comm Tech]
-    FOT --> MT[Dept of Materials Technology]
+    FOT --> DICT[Dept of Information & Comm Tech]
+    FOT --> DBST[Dept of Biosystems Technology]
+    FOT --> DET[Dept of Engineering Technology]
 
-    ICT --> M1[ITIC1282: Skill Development Project II]
-    ICT --> M2[ITIC1242: Data Structures & Algorithms]
-    ICT --> M3[ITIC1260: Database Management Systems]
-    ICT --> M4[ITIC1212: Computer Networks]
-    ICT --> M5[ITIC1232: Operating Systems]
-    ICT --> M6[ITIC1252: Discrete Mathematics]
-    ICT --> M7[ITIC1272: Web Technologies]
-    ICT --> M8[ITIC1222: Software Engineering]
+    FOC --> DCS[Dept of Computer Science]
+    FOC --> DIT[Dept of Information Technology]
+    FOC --> DCE[Dept of Computer Engineering]
+    FOC --> DCM[Dept of Computational Mathematics]
+
+    DICT --> M1[ICT2282: Skill Development Project II]
+    DICT --> M2[ICT1223: Data Structures & Algorithms]
+    DICT --> M3[ICT1233: Database Management Systems]
+    DICT --> M4[ICT2123: Computer Networks & Data Comm]
+    DICT --> M5[ICT2133: Operating Systems & Linux Admin]
+    DICT --> M6[ICT1133: Mathematics for Technology]
+    DICT --> M7[ICT2113: Web Technologies & Applications]
+    DICT --> M8[ICT2213: Software Engineering Principles]
 ```
 
 ---
@@ -365,7 +371,7 @@ flowchart TD
     end
 
     subgraph Cloud [Persistence Tier: Supabase Cloud]
-        Auth[Supabase Auth: JWT / Email]
+        Auth[Supabase Auth: Google OAuth + JWT]
         DB[(PostgreSQL 15 + RLS)]
         RT[Supabase Realtime WebSocket Channels]
     end
@@ -381,7 +387,7 @@ flowchart TD
 
 | Evaluation Metric | SDP I Prototype (Initial) | SDP II Production System (Current) | Viva Justification |
 |---|---|---|---|
-| **Identity / Auth** | Anonymous UUIDv4 in `localStorage` | Authenticated KDU Email + Role Claim | Anonymous IDs create harassment vulnerabilities; verified email enforces peer accountability. |
+| **Identity / Auth** | Anonymous UUIDv4 in `localStorage` | Google OAuth SSO (`@kdu.ac.lk` domain restriction) | Anonymous IDs create harassment vulnerabilities; verified Google Workspace email enforces peer accountability. |
 | **Backend Architecture** | Hand-rolled Express/Node.js Server | Supabase BaaS (PostgreSQL + RLS) | Eliminates single-point-of-failure server maintenance; leverages managed enterprise infrastructure. |
 | **Security Layer** | Application-level IF statements | Database Row-Level Security (RLS) | Code-level checks can be bypassed via API injection; PostgreSQL RLS policies enforce access at the engine level. |
 | **Realtime Messaging** | Custom Socket.io daemon | Managed Realtime Engine | Socket daemons require constant process supervision; managed WebSockets ensure 99.9% uptime. |
@@ -409,7 +415,7 @@ async function getGroups() {
 }
 ```
 
-* State is preserved in browser storage under key: `kdu_studyconnect_state_v6`.
+* State is preserved in browser storage under key: `kdu_studyconnect_clean_v1`.
 
 ---
 
@@ -574,16 +580,17 @@ USING (
 
 ```
 kdu-study-finder/
-├── index.html          # Authentication gateway + 1-Click Viva Demo Fillers
+├── index.html          # Authentication gateway (Google OAuth @kdu.ac.lk sign-in)
 ├── dashboard.html      # Primary student portal with ranked peer recommendation cards
 ├── profile.html        # Dynamic academic setup (cascading dropdowns + 7x3 availability grid)
 ├── groups.html         # Syndicate directory with status tabs (All, My Modules, My Syndicates)
 ├── group.html          # Collaborative syndicate hub (live chat, calendar, member roster)
 ├── admin.html          # Faculty moderation console (KPI metrics, user directory, approvals)
 ├── config.js           # Supabase environment variables & configuration status check
-├── backend.js          # Unified Data Access Layer (PostgreSQL + LocalStorage v6 fallback)
+├── backend.js          # Unified Data Access Layer (PostgreSQL + LocalStorage fallback)
 ├── app.js              # Controllers, DOM binders, and 60/40 algorithm implementation
 ├── style.css           # Global typography, military cadet tokens, and custom scrollbars
+├── supabase-schema.sql # Complete PostgreSQL DDL, RLS policies, triggers & KDU catalog seed
 └── img/
     └── kdu-logo.png    # Official General Sir John Kotelawala Defence University crest
 ```
@@ -603,24 +610,25 @@ Use this sequence during your lecture viva presentation:
 │ Step  │ Action on Screen     │ Narration / Presentation Talking Point           │
 ├───────┼──────────────────────┼──────────────────────────────────────────────────┤
 │ 1     │ Open index.html      │ "Respected lecturers, here is KDU StudyConnect.  │
-│       │                      │ Observe the authentic KDU branding and one-click │
-│       │                      │ evaluation buttons configured for our group."    │
+│       │                      │ Observe the authentic KDU branding and the       │
+│       │                      │ Google OAuth sign-in restricted to @kdu.ac.lk."  │
 ├───────┼──────────────────────┼──────────────────────────────────────────────────┤
-│ 2     │ Click [N.R.H.D.      │ "Logging in as our Syndicate Leader, Bandara.    │
-│       │ Bandara (Lead)]      │ Notice the Day Scholar badge, BTech ICT modules, │
-│       │                      │ and the 60/40 algorithm peer recommendations."   │
+│ 2     │ Click [Sign In with  │ "Signing in with a verified KDU university       │
+│       │ University Google    │ Google account. The system enforces domain        │
+│       │ (@kdu.ac.lk)]        │ restriction — only @kdu.ac.lk emails are         │
+│       │                      │ accepted via Google OAuth `hd` parameter."       │
 ├───────┼──────────────────────┼──────────────────────────────────────────────────┤
-│ 3     │ Inspect Match Card   │ "Notice the Explainability badge: it explicitly  │
-│       │ (Cadet Kasun Mendis) │ states shared modules ITIC1282 and ITIC1242 plus │
-│       │                      │ overlapping Wednesday slots. No black-box math." │
+│ 3     │ Complete profile     │ "After authentication, the student sets up their │
+│       │ setup on profile.html│ academic profile: faculty, department, courses,   │
+│       │                      │ and the 7×3 weekly availability grid."            │
 ├───────┼──────────────────────┼──────────────────────────────────────────────────┤
-│ 4     │ Open group.html      │ "Entering SDP II Group 10 syndicate: here we see │
-│       │ (Group 10 Syndicate) │ all 5 group members, real-time message chat,     │
-│       │                      │ and the scheduled Viva Mock study session."      │
+│ 4     │ Inspect Match Cards  │ "Notice the Explainability badge: it explicitly  │
+│       │ on dashboard.html    │ states shared modules and overlapping study       │
+│       │                      │ windows. The 60/40 algorithm is fully visible."   │
 ├───────┼──────────────────────┼──────────────────────────────────────────────────┤
-│ 5     │ Click [Maj.          │ "Switching to our Faculty Coordinator view:      │
-│       │ Jayawardena (Admin)] │ role-gated admin portal with student analytics,  │
-│       │                      │ Cadet vs Day Scholar metrics, and moderation."   │
+│ 5     │ Open group.html      │ "Entering a study syndicate: here we see the     │
+│       │ (Syndicate Hub)      │ member roster, real-time message chat, and the    │
+│       │                      │ scheduled study sessions calendar."              │
 └───────┴──────────────────────┴──────────────────────────────────────────────────┘
 ```
 
@@ -648,13 +656,42 @@ Use this sequence during your lecture viva presentation:
 
 ## 9. Installation, Setup & Verification
 
-### Running the Application Locally
+### 9.1 Prerequisites
+- A [Supabase](https://supabase.com) project (free tier supported)
+- A Google Cloud Console project with OAuth 2.0 credentials
+- Google Chrome or Microsoft Edge browser
+
+### 9.2 Supabase Configuration
+
+1. **Create a Supabase project** at [supabase.com/dashboard](https://supabase.com/dashboard).
+2. **Run the database schema** — Open the Supabase SQL Editor and paste the contents of [`supabase-schema.sql`](file:///C:/Users/ACER/OneDrive/Desktop/REPO/kdu-study-finder/supabase-schema.sql). This creates all tables, RLS policies, triggers, and seeds the verified KDU academic catalog (7 faculties, 25 departments, 100+ courses).
+3. **Set your credentials** — Update [`config.js`](file:///C:/Users/ACER/OneDrive/Desktop/REPO/kdu-study-finder/config.js) with your Supabase project URL and Anon Key:
+   ```javascript
+   const SUPABASE_URL = "https://YOUR_PROJECT_REF.supabase.co";
+   const SUPABASE_ANON_KEY = "eyJhbGciOi...YOUR_ANON_KEY";
+   ```
+   Alternatively, set `supabase_url` and `supabase_anon_key` in browser localStorage.
+
+### 9.3 Google OAuth Setup (University Domain Restriction)
+
+1. Go to [Google Cloud Console → APIs & Services → Credentials](https://console.cloud.google.com/apis/credentials).
+2. Create an **OAuth 2.0 Client ID** (Web Application type).
+3. Add authorized redirect URI: `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`
+4. In Supabase Dashboard → Authentication → Providers → Google:
+   - Enable Google provider
+   - Paste Client ID and Client Secret
+5. **Domain restriction** is enforced at two levels:
+   - **OAuth level:** The `hd: "kdu.ac.lk"` parameter in the sign-in request limits the Google account picker to `@kdu.ac.lk` accounts.
+   - **Database level:** The `enforce_kdu_email_domain` trigger in `supabase-schema.sql` rejects any email not ending in `@kdu.ac.lk`.
+
+### 9.4 Running Locally
+
 1. **Open in VS Code:**
    ```text
    C:\Users\ACER\OneDrive\Desktop\REPO\kdu-study-finder
    ```
 2. **Launch with VS Code Live Server:**
-   - Right-click [`index.html`](file:///C:/Users/ACER/OneDrive/Desktop/REPO/kdu-study-finder/index.html) $\rightarrow$ **"Open with Live Server"**.
+   - Right-click [`index.html`](file:///C:/Users/ACER/OneDrive/Desktop/REPO/kdu-study-finder/index.html) → **"Open with Live Server"**.
 3. **Alternatively, run via Python HTTP Server:**
    ```powershell
    cd C:\Users\ACER\OneDrive\Desktop\REPO\kdu-study-finder
@@ -662,8 +699,14 @@ Use this sequence during your lecture viva presentation:
    ```
    Open `http://localhost:3000` in Google Chrome or Microsoft Edge.
 
-### Automated Node.js Syntax Verification
-Execute the following commands to confirm JavaScript engine syntax validity:
+### 9.5 Offline Fallback Mode
+If Supabase is not configured or internet is unavailable, the app automatically falls back to browser localStorage (`kdu_studyconnect_clean_v1`). This guarantees zero-failure presentations during lecture viva even without Wi-Fi.
+
+### 9.6 Deployment (GitHub Pages)
+This repository is deployed via GitHub Pages at:  
+`https://hirushadewminabandara.github.io/kdu-study-finder/`
+
+### 9.7 Syntax Verification
 ```powershell
 node -c "C:\Users\ACER\OneDrive\Desktop\REPO\kdu-study-finder\config.js"
 node -c "C:\Users\ACER\OneDrive\Desktop\REPO\kdu-study-finder\backend.js"
@@ -675,6 +718,6 @@ node -c "C:\Users\ACER\OneDrive\Desktop\REPO\kdu-study-finder\app.js"
 
 ## 📜 Intellectual Property & University Citation
 * **Project:** KDU StudyConnect (Skill Development Project II)
-* **Authoring Syndicate:** Group 10 · Intake 43 · Department of Biosystems Technology · Faculty of Technology
+* **Authoring Syndicate:** Group 10 · Intake 43 · Department of Information and Communication Technology · Faculty of Technology
 * **Institution:** General Sir John Kotelawala Defence University (KDU), Kandawala Estate, Ratmalana, Sri Lanka.  
 * **Academic Year:** 2026
