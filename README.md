@@ -34,6 +34,10 @@
    - 8.1 [Live Demo Walkthrough Script](#81-live-demo-walkthrough-script)
    - 8.2 [Viva Defense FAQ & Model Responses](#82-viva-defense-faq--model-responses)
 9. [Installation, Setup & Verification](#9-installation-setup--verification)
+10. [Future Improvements & Development Roadmap](#10-future-improvements--development-roadmap)
+    - 10.1 [Priority Matrix](#101-priority-matrix)
+    - 10.2 [Immediate SQL Fixes](#102-immediate-sql-fixes)
+    - 10.3 [Planned Feature Enhancements](#103-planned-feature-enhancements)
 
 ---
 
@@ -713,6 +717,71 @@ node -c "C:\Users\ACER\OneDrive\Desktop\REPO\kdu-study-finder\backend.js"
 node -c "C:\Users\ACER\OneDrive\Desktop\REPO\kdu-study-finder\app.js"
 ```
 *Expected Result:* All three commands exit with code `0`.
+
+---
+
+## 10. Future Improvements & Development Roadmap
+
+The following enhancements are planned for future development cycles to improve reliability, real-time responsiveness, and feature completeness.
+
+### 10.1 Priority Matrix
+
+| Priority | Improvement | Description | Estimated Effort |
+|----------|-------------|-------------|------------------|
+| 🔴 High | **Realtime Replica Identity Fix** | Enable full payload delivery for `UPDATE` and `DELETE` events on realtime-published tables. Without `REPLICA IDENTITY FULL`, Supabase Realtime only delivers complete row data on `INSERT` events. | ~1 minute (SQL) |
+| 🟡 Medium | **Realtime Subscriptions for Join Requests & Sessions** | Currently, only group chat messages have active WebSocket subscriptions. New join requests, group status changes, and study session creation require a manual page refresh to appear. | ~30 min |
+| 🟡 Medium | **Graceful Error Handling for Optimistic Writes** | `backend.js` currently mutates local state optimistically regardless of whether the Supabase network call succeeds. If a write is rejected by RLS or a network error occurs, the client shows success while the database remains unchanged. | ~1 hour |
+| 🟢 Low | **Google OAuth SSO Integration** | Add one-click Google sign-in restricted to `@kdu.ac.lk` domain via the `hd` parameter, enabling seamless authentication for KDU students without manual email/password registration. | ~15 min |
+| 🟢 Low | **1:1 Partner Request Persistence** | The `sendPartnerRequest()` function currently only writes to `localStorage`. A new `partner_requests` table (or extending `join_requests` with nullable `group_id`) is needed for cross-device sync. | ~45 min |
+
+### 10.2 Immediate SQL Fixes
+
+Run the following in the **Supabase SQL Editor** to enable reliable realtime event delivery:
+
+```sql
+-- Enable full replica identity for realtime-published tables
+-- This ensures UPDATE and DELETE events include complete row payloads
+ALTER TABLE public.messages REPLICA IDENTITY FULL;
+ALTER TABLE public.join_requests REPLICA IDENTITY FULL;
+ALTER TABLE public.groups REPLICA IDENTITY FULL;
+ALTER TABLE public.study_sessions REPLICA IDENTITY FULL;
+```
+
+### 10.3 Planned Feature Enhancements
+
+1. **Extended Realtime Channels:**
+   Subscribe to `join_requests`, `groups`, and `study_sessions` tables via Supabase Realtime to provide instant UI updates when:
+   - A new student requests to join a syndicate
+   - A syndicate leader approves or rejects a request
+   - A new study session is scheduled by any group member
+
+2. **Network-Aware Write Operations:**
+   Implement a transactional write pattern where local state is only committed after Supabase confirms the operation:
+   ```javascript
+   // Proposed pattern
+   const { data, error } = await sbClient.from('table').insert(payload);
+   if (error) {
+     showToast('Operation failed. Please try again.', 'error');
+     return; // Do NOT update local state
+   }
+   state.collection.push(data); // Commit only on success
+   ```
+
+3. **Partner Request Database Table:**
+   ```sql
+   CREATE TABLE public.partner_requests (
+     id SERIAL PRIMARY KEY,
+     from_student UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+     to_student UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
+     requested_at TIMESTAMPTZ DEFAULT NOW(),
+     UNIQUE (from_student, to_student)
+   );
+   ALTER TABLE public.partner_requests ENABLE ROW LEVEL SECURITY;
+   ```
+
+4. **Email Confirmation Toggle:**
+   For production deployment, re-enable Supabase email confirmation and implement a post-confirmation profile creation flow to ensure RLS compliance during the sign-up process.
 
 ---
 
