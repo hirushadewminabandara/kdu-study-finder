@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>KDU StudyConnect | Student Profile &amp; Preferences</title>
+  <link rel="icon" type="image/png" href="img/kdu-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#123356",
+            "primary-container": "#2c4a6e",
+            "on-primary": "#ffffff",
+            "secondary": "#765a00",
+            "secondary-container": "#fed56f",
+            "on-secondary": "#ffffff",
+            "tertiary": "#003934",
+            "tertiary-container": "#00524b",
+            "surface": "#f9f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f0f3ff",
+            "surface-container": "#e7eeff",
+            "surface-container-high": "#dee8ff",
+            "on-surface": "#111c2d",
+            "on-surface-variant": "#43474e",
+            "outline": "#73777f",
+            "outline-variant": "#c3c6cf",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body data-page="profile" class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- Universal Header (rendered by app.js) -->
+  <header></header>
+
+  <!-- Main Content Container -->
+  <main class="w-full pt-20 pb-16 flex-grow">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+
+      <!-- Breadcrumb & Header Title -->
+      <div class="mb-6 pb-4 border-b border-outline-variant/60 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 text-xs uppercase tracking-wider text-on-surface-variant font-semibold mb-1">
+            <span>Academic Portal</span>
+            <span>•</span>
+            <span class="text-secondary font-bold">Matching Profile Configuration</span>
+          </div>
+          <h1 class="text-2xl font-bold text-primary tracking-tight">Student Profile &amp; Preferences</h1>
+          <p class="text-xs text-on-surface-variant mt-1">Set your academic details, enrolled degree modules, and weekly free time to power peer matching.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="studentTypePreview" class="px-3 py-1 rounded-xl text-xs font-bold bg-surface-container text-primary">
+            Detecting...
+          </span>
+        </div>
+      </div>
+
+      <!-- Main Profile Card Form -->
+      <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 shadow-sm p-6 sm:p-8 flex flex-col gap-8">
+        
+        <!-- SECTION 1: Personal Information -->
+        <section class="flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-surface-container text-primary text-xs font-bold flex items-center justify-center">1</span>
+              <h2 class="text-base font-bold text-primary">Personal Details &amp; Registration</h2>
+            </div>
+            <span class="text-[11px] uppercase tracking-wider text-on-surface-variant font-medium">Identity Records</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col">
+              <label for="fullName" class="text-xs font-semibold text-on-surface mb-1.5">Full Name (with initials)</label>
+              <input id="fullName" type="text" placeholder="Nuwan K. Perera" class="h-10 px-3 text-sm text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors">
+            </div>
+            <div class="flex flex-col">
+              <label for="indexNumber" class="text-xs font-semibold text-on-surface mb-1.5">KDU Index Number</label>
+              <input id="indexNumber" type="text" placeholder="D/ICT/23/0010" class="h-10 px-3 text-sm font-mono uppercase text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors">
+              <span class="text-[10px] text-outline mt-1">D = Day Scholar, C = Officer Cadet</span>
+            </div>
+            <div class="flex flex-col">
+              <label for="universityEmail" class="text-xs font-semibold text-on-surface mb-1.5">Email Address</label>
+              <input id="universityEmail" type="email" readonly class="h-10 px-3 text-sm text-on-surface-variant bg-surface-container-low border border-outline-variant/60 rounded-xl cursor-not-allowed select-none">
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: Academic Affiliation -->
+        <section class="flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-surface-container text-primary text-xs font-bold flex items-center justify-center">2</span>
+              <h2 class="text-base font-bold text-primary">Faculty, Department &amp; Intake</h2>
+            </div>
+            <span class="text-[11px] uppercase tracking-wider text-on-surface-variant font-medium">Academic Hierarchy</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="flex flex-col">
+              <label for="p-faculty" class="text-xs font-semibold text-on-surface mb-1.5">Faculty</label>
+              <select id="p-faculty" class="h-10 px-2.5 text-xs font-medium text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors cursor-pointer">
+                <!-- Dynamically populated from KDU_CATALOG -->
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <label for="p-department" class="text-xs font-semibold text-on-surface mb-1.5">Department &amp; Degree</label>
+              <select id="p-department" class="h-10 px-2.5 text-xs font-medium text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors cursor-pointer">
+                <!-- Dynamically populated cascade -->
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <label for="p-intake" class="text-xs font-semibold text-on-surface mb-1.5">Intake</label>
+              <select id="p-intake" class="h-10 px-2.5 text-xs font-medium text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors cursor-pointer">
+                <!-- Intakes 39 to 44 -->
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <label for="p-year" class="text-xs font-semibold text-on-surface mb-1.5">Year of Study</label>
+              <select id="p-year" class="h-10 px-2.5 text-xs font-medium text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors cursor-pointer">
+                <!-- Years 1 to 4 -->
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: Current Enrolled Modules -->
+        <section class="flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-surface-container text-primary text-xs font-bold flex items-center justify-center">3</span>
+              <h2 class="text-base font-bold text-primary">Current Enrolled Course Modules</h2>
+            </div>
+            <span class="text-[11px] text-primary font-bold bg-surface-container px-2.5 py-0.5 rounded">60% Matching Weight</span>
+          </div>
+
+          <div class="bg-surface-container-low px-4 py-3 rounded-xl flex items-center gap-3 border border-outline-variant/60 text-xs text-on-surface-variant">
+            <span class="material-symbols-outlined text-[18px] text-primary shrink-0">info</span>
+            <span>Click to select or deselect modules for your active semester. The matching algorithm evaluates overlap against these exact course codes.</span>
+          </div>
+
+          <!-- Dynamic Module Selector Grid -->
+          <div id="moduleSelector" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <!-- Populated dynamically based on selected Department & Degree -->
+          </div>
+        </section>
+
+        <!-- SECTION 4: Weekly Availability Grid -->
+        <section class="flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-surface-container text-primary text-xs font-bold flex items-center justify-center">4</span>
+              <h2 class="text-base font-bold text-primary">Weekly Free-Time Availability Matrix</h2>
+            </div>
+            <span class="text-[11px] text-secondary font-bold bg-secondary/15 px-2.5 py-0.5 rounded">40% Matching Weight</span>
+          </div>
+
+          <p class="text-xs text-on-surface-variant">
+            Mark your recurring weekly hours when you are free from parades, military drills, or scheduled university lectures to study with peers.
+          </p>
+
+          <!-- Interactive Availability Grid -->
+          <div id="avail-grid" class="bg-surface-container-lowest border border-outline-variant/80 rounded-2xl p-4 shadow-sm">
+            <!-- Rendered by app.js -->
+          </div>
+        </section>
+
+        <!-- Submit & Save Actions -->
+        <div class="pt-4 border-t border-outline-variant/60 flex items-center justify-end gap-3">
+          <a href="dashboard.html" class="px-5 py-2.5 rounded-xl border border-outline-variant text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors">
+            Cancel
+          </a>
+          <button id="btn-save-profile" type="button" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold uppercase tracking-wider hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px]">save</span>
+            <span>Save Academic Preferences</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="py-4 text-center text-xs text-on-surface-variant border-t border-outline-variant/40 bg-surface-container-lowest mt-auto">
+    General Sir John Kotelawala Defence University • Skill Development Project II (SDP II)
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="backend.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>KDU StudyConnect | Student Dashboard</title>
+  <link rel="icon" type="image/png" href="img/kdu-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#123356",
+            "primary-container": "#2c4a6e",
+            "on-primary": "#ffffff",
+            "secondary": "#765a00",
+            "secondary-container": "#fed56f",
+            "on-secondary": "#ffffff",
+            "tertiary": "#003934",
+            "tertiary-container": "#00524b",
+            "surface": "#f9f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f0f3ff",
+            "surface-container": "#e7eeff",
+            "surface-container-high": "#dee8ff",
+            "on-surface": "#111c2d",
+            "on-surface-variant": "#43474e",
+            "outline": "#73777f",
+            "outline-variant": "#c3c6cf",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body data-page="dashboard" class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- Universal Header (rendered by app.js) -->
+  <header></header>
+
+  <!-- Main Content Container -->
+  <main class="w-full pt-20 pb-16 flex-grow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+      <!-- Academic Greeting & Status Zone -->
+      <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/60 shadow-sm mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex flex-col">
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 id="dash-greeting-name" class="text-2xl font-bold text-primary tracking-tight">
+              Ayubowan, Student
+            </h1>
+            <span id="dash-user-badge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-surface-container text-primary">
+              Active Student
+            </span>
+          </div>
+          <div id="dash-user-meta" class="flex items-center gap-2 mt-2 text-xs text-on-surface-variant flex-wrap font-medium">
+            <span>Intake 43</span>
+            <span class="text-outline">•</span>
+            <span>Faculty of Technology</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="profile.html" class="h-10 px-4 rounded-xl border border-outline-variant hover:bg-surface-container text-on-surface text-xs font-semibold transition-colors flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-primary">edit_calendar</span>
+            <span>Update Availability</span>
+          </a>
+          <a href="groups.html" class="h-10 px-4 rounded-xl bg-primary text-on-primary hover:bg-primary-container text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm">
+            <span class="material-symbols-outlined text-[18px]">groups</span>
+            <span>Explore Syndicates</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Key Performance Stat Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Stat 1 -->
+        <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase font-bold tracking-wider text-on-surface-variant">Suggested Peers</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">person_search</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span id="kpi-partners-count" class="text-3xl font-bold text-primary">0</span>
+            <p class="text-xs text-on-surface-variant mt-1">Weighted 60/40 algorithm</p>
+          </div>
+        </div>
+        <!-- Stat 2 -->
+        <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase font-bold tracking-wider text-on-surface-variant">Active Syndicates</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">groups</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span id="kpi-groups-count" class="text-3xl font-bold text-primary">0</span>
+            <p class="text-xs text-on-surface-variant mt-1">Study circles enrolled</p>
+          </div>
+        </div>
+        <!-- Stat 3 -->
+        <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase font-bold tracking-wider text-on-surface-variant">Enrolled Modules</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">auto_stories</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span id="kpi-modules-count" class="text-3xl font-bold text-primary">0</span>
+            <p class="text-xs text-on-surface-variant mt-1">Current semester units</p>
+          </div>
+        </div>
+        <!-- Stat 4 -->
+        <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase font-bold tracking-wider text-on-surface-variant">Pending Requests</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-secondary">
+              <span class="material-symbols-outlined text-[18px]">hourglass_top</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span id="kpi-requests-count" class="text-3xl font-bold text-secondary">0</span>
+            <p class="text-xs text-on-surface-variant mt-1">Awaiting partner response</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Two-Column Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left 2 Cols: Suggested Study Partners -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-outline-variant/60">
+            <div>
+              <h2 class="text-lg font-bold text-primary tracking-tight">Compatible Study Partners</h2>
+              <p class="text-xs text-on-surface-variant">Ranked automatically by shared KDU modules (60%) &amp; overlapping schedule (40%).</p>
+            </div>
+            
+            <!-- Quick Filter Chips -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button type="button" data-filter="all" class="dash-filter-chip px-3 py-1 rounded-lg text-xs font-semibold bg-primary text-on-primary transition-colors">
+                All Modules
+              </button>
+              <button type="button" data-filter="ITIC1282" class="dash-filter-chip px-3 py-1 rounded-lg text-xs font-semibold bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors">
+                ITIC1282 (SDP II)
+              </button>
+              <button type="button" data-filter="ITIC1242" class="dash-filter-chip px-3 py-1 rounded-lg text-xs font-semibold bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors">
+                ITIC1242 (DSA)
+              </button>
+              <button type="button" data-filter="ITIC1260" class="dash-filter-chip px-3 py-1 rounded-lg text-xs font-semibold bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors">
+                ITIC1260 (DBMS)
+              </button>
+            </div>
+          </div>
+
+          <!-- Match Cards Grid -->
+          <div id="match-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Rendered dynamically by app.js -->
+          </div>
+        </div>
+
+        <!-- Right 1 Col: Pending Requests & My Groups -->
+        <div class="flex flex-col gap-6">
+          
+          <!-- Incoming / Outgoing Study Requests Card -->
+          <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-sm flex flex-col gap-4">
+            <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+              <h3 class="text-sm font-bold text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-secondary">mark_email_unread</span>
+                Incoming Requests
+              </h3>
+            </div>
+            <div id="incoming-requests-list" class="flex flex-col gap-2.5">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <div class="border-t border-outline-variant/40 pt-3">
+              <span class="text-xs uppercase font-bold text-on-surface-variant tracking-wider block mb-2">Sent Invitations</span>
+              <div id="outgoing-requests-list" class="flex flex-col gap-2">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- My Study Groups Card -->
+          <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-sm flex flex-col gap-4">
+            <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+              <h3 class="text-sm font-bold text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-primary">groups</span>
+                My Study Syndicates
+              </h3>
+              <a href="groups.html" class="text-xs text-primary font-semibold hover:underline">View All</a>
+            </div>
+            <div id="my-groups-preview-list" class="flex flex-col gap-2.5">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Cadet / Student Inspection Modal -->
+  <div id="cadet-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-surface-container-lowest w-full max-w-md rounded-2xl border border-outline-variant shadow-2xl p-6 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+      <div class="flex items-start justify-between border-b border-outline-variant pb-3">
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <h3 id="modal-cadet-name" class="text-lg font-bold text-primary">Cadet Name</h3>
+            <span id="modal-cadet-badge" class="px-2 py-0.5 rounded text-[10px] font-bold">Cadet</span>
+          </div>
+          <span id="modal-cadet-meta" class="text-xs text-on-surface-variant mt-0.5">Faculty · Intake</span>
+        </div>
+        <button type="button" onclick="closeCadetModal()" class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-on-surface-variant">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3 text-xs">
+        <div>
+          <span class="font-bold text-on-surface block mb-1.5">Enrolled Course Units</span>
+          <div id="modal-cadet-modules" class="flex flex-wrap gap-1.5"></div>
+        </div>
+        <div>
+          <span class="font-bold text-on-surface block mb-1.5">Weekly Availability Blocks</span>
+          <div id="modal-cadet-avail" class="flex flex-wrap gap-1.5"></div>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-outline-variant flex justify-end">
+        <button type="button" onclick="closeCadetModal()" class="px-4 py-2 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary-container transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="py-4 text-center text-xs text-on-surface-variant border-t border-outline-variant/40 bg-surface-container-lowest mt-auto">
+    General Sir John Kotelawala Defence University • Skill Development Project II (SDP II)
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="backend.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

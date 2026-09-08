@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>KDU StudyConnect | Academic Administration &amp; Moderation</title>
+  <link rel="icon" type="image/png" href="img/kdu-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#123356",
+            "primary-container": "#2c4a6e",
+            "on-primary": "#ffffff",
+            "secondary": "#765a00",
+            "secondary-container": "#fed56f",
+            "on-secondary": "#ffffff",
+            "tertiary": "#003934",
+            "tertiary-container": "#00524b",
+            "surface": "#f9f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f0f3ff",
+            "surface-container": "#e7eeff",
+            "surface-container-high": "#dee8ff",
+            "on-surface": "#111c2d",
+            "on-surface-variant": "#43474e",
+            "outline": "#73777f",
+            "outline-variant": "#c3c6cf",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body data-page="admin" class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- Universal Header (rendered by app.js) -->
+  <header></header>
+
+  <!-- Main Content Container -->
+  <main class="w-full pt-20 pb-16 flex-grow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+      <!-- Page Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 mb-6 border-b border-outline-variant/60">
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2 mb-1 text-xs uppercase tracking-wider text-primary font-bold">
+            <span>Directorate of Academic Affairs</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            <span class="text-on-surface-variant">Moderation Console</span>
+          </div>
+          <h1 class="text-2xl font-bold text-primary tracking-tight">System Administration &amp; Moderation</h1>
+          <p class="text-xs text-on-surface-variant mt-1">
+            General Sir John Kotelawala Defence University • Student Affairs &amp; Peer Learning Oversight
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="bg-primary text-on-primary border border-secondary px-3 py-2 rounded-xl flex items-center gap-2 shadow-sm">
+            <span class="material-symbols-outlined text-[18px] text-secondary">military_tech</span>
+            <div class="flex flex-col">
+              <span class="text-[10px] uppercase font-bold text-secondary tracking-wider">Authorized Role</span>
+              <span class="text-xs font-semibold">Dean / Academic Officer</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview KPI Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase font-bold tracking-wider text-on-surface-variant">Registered Students</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">person</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span id="admin-stat-students" class="text-3xl font-bold text-primary">0</span>
+            <p class="text-xs text-on-surface-variant mt-1">Cadets &amp; Day Scholars</p>
+          </div>
+        </div>
+
+        <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase font-bold tracking-wider text-on-surface-variant">Active Syndicates</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">groups</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span id="admin-stat-groups" class="text-3xl font-bold text-primary">0</span>
+            <p class="text-xs text-on-surface-variant mt-1">Study circles managed</p>
+          </div>
+        </div>
+
+        <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase font-bold tracking-wider text-on-surface-variant">Messages Exchanged</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">forum</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span id="admin-stat-messages" class="text-3xl font-bold text-primary">0</span>
+            <p class="text-xs text-on-surface-variant mt-1">Realtime collaborative chat</p>
+          </div>
+        </div>
+
+        <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase font-bold tracking-wider text-on-surface-variant">Pending Approvals</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-secondary">
+              <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span id="admin-stat-pending" class="text-3xl font-bold text-secondary">0</span>
+            <p class="text-xs text-on-surface-variant mt-1">Queue for moderation</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 1: Moderation Queue Table -->
+      <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 shadow-sm p-6 mb-8 flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+          <h2 class="text-base font-bold text-primary flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px] text-secondary">assignment_turned_in</span>
+            Pending Moderation Queue (Join &amp; Partner Requests)
+          </h2>
+          <span class="text-xs text-on-surface-variant">Realtime Approval Controls</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-outline-variant text-[11px] uppercase font-bold text-on-surface-variant tracking-wider bg-surface-container-low/40">
+                <th class="py-3 px-4">Applicant Cadet/Student</th>
+                <th class="py-3 px-4">Target Peer or Syndicate</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4">Moderation Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-requests-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 2: Registered Students Roster -->
+      <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 shadow-sm p-6 mb-8 flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+          <h2 class="text-base font-bold text-primary flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px] text-primary">school</span>
+            Registered KDU Student Directory
+          </h2>
+          <span class="text-xs text-on-surface-variant">Cadet vs. Day Scholar Records</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-outline-variant text-[11px] uppercase font-bold text-on-surface-variant tracking-wider bg-surface-container-low/40">
+                <th class="py-3 px-4">Student Name</th>
+                <th class="py-3 px-4">KDU Index No</th>
+                <th class="py-3 px-4">Classification</th>
+                <th class="py-3 px-4">Faculty &amp; Department</th>
+                <th class="py-3 px-4">Intake</th>
+                <th class="py-3 px-4">Profile Status</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 3: Study Syndicates Management -->
+      <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 shadow-sm p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+          <h2 class="text-base font-bold text-primary flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px] text-primary">groups</span>
+            Study Syndicates Directory &amp; Status Controls
+          </h2>
+          <span class="text-xs text-on-surface-variant">Lifecycle Management</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-outline-variant text-[11px] uppercase font-bold text-on-surface-variant tracking-wider bg-surface-container-low/40">
+                <th class="py-3 px-4">Syndicate Name</th>
+                <th class="py-3 px-4">Course Focus</th>
+                <th class="py-3 px-4">Members / Seats</th>
+                <th class="py-3 px-4">State</th>
+                <th class="py-3 px-4">Lifecycle Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-groups-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="py-4 text-center text-xs text-on-surface-variant border-t border-outline-variant/40 bg-surface-container-lowest mt-auto">
+    General Sir John Kotelawala Defence University • Skill Development Project II (SDP II)
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="backend.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
