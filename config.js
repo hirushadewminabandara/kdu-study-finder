@@ -9,8 +9,8 @@
 // 4. Copy "Project URL" and paste it into SUPABASE_URL below.
 // 5. Copy "anon" / "public" Project API Key and paste it into SUPABASE_ANON_KEY below.
 
-const SUPABASE_URL = "";
-const SUPABASE_ANON_KEY = "";
+const SUPABASE_URL = "https://ergnurcmkixwtdqrxlfy.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_Bj1VmOfnpIQXIVAX8ChpbA_lUr0EZax";
 
 function getSupabaseUrl() {
   if (typeof SUPABASE_URL === "string" && SUPABASE_URL.trim().length > 0 && !SUPABASE_URL.includes("YOUR_PROJECT")) {
