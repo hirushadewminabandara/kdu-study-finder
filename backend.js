@@ -244,200 +244,21 @@ function getStudentType(indexNo) {
   return { type: "Day Scholar", label: "Day Scholar", isCadet: false, badgeClass: "bg-surface-container-high text-primary-container font-semibold" };
 }
 
-// Initial Seed Database (Authentic KDU Technology Faculty ICT Intake 43)
+
+// Clean Initial State (Completely free of mock/demo users, groups, or chats)
 function getInitialSeedState() {
   return {
     faculties: KDU_CATALOG,
-    users: [
-      {
-        id: "usr-perera",
-        name: "M.A.C.L. Perera",
-        email: "perera.macl@kdu.ac.lk",
-        indexNo: "D/ICT/26/0010",
-        role: "student",
-        facultyId: 1, // Faculty of Technology
-        departmentId: 1, // Department of Biosystems Technology
-        intake: "43",
-        year: 2,
-        bio: "BT (Hons) in ICT, Intake 43 (Group 10). Lead system architecture & algorithm implementation.",
-        courses: [101, 102, 103, 104, 106], // ITIC1282, ITIC1242, ITIC1260, ITIC1212, ITIC1252
-        availability: ["Mon-3", "Wed-2", "Fri-3", "Sat-1"]
-      },
-      {
-        id: "usr-nethmini",
-        name: "W.A.S. Nethmini",
-        email: "nethmini.was@kdu.ac.lk",
-        indexNo: "D/ICT/26/0028",
-        role: "student",
-        facultyId: 1,
-        departmentId: 1,
-        intake: "43",
-        year: 2,
-        bio: "BT (Hons) in ICT, Intake 43 (Group 10). Focus on relational database schema and discrete mathematics.",
-        courses: [101, 102, 103, 106, 108], // ITIC1282, ITIC1242, ITIC1260, ITIC1252, ITIC1222
-        availability: ["Mon-3", "Wed-2", "Sat-1"]
-      },
-      {
-        id: "usr-bandara",
-        name: "N.R.H.D. Bandara",
-        email: "bandara.nrhd@kdu.ac.lk",
-        indexNo: "D/ICT/26/0042",
-        role: "student",
-        facultyId: 1,
-        departmentId: 1,
-        intake: "43",
-        year: 2,
-        bio: "BT (Hons) in ICT, Intake 43 (Group 10). Specializing in computer networking and system administration.",
-        courses: [101, 102, 104, 105, 107], // ITIC1282, ITIC1242, ITIC1212, ITIC1232, ITIC1272
-        availability: ["Mon-3", "Tue-2", "Wed-2"]
-      },
-      {
-        id: "usr-dahanayaka",
-        name: "D.G.K.N. Dahanayaka",
-        email: "dahanayaka.dgkn@kdu.ac.lk",
-        indexNo: "D/ICT/26/0059",
-        role: "student",
-        facultyId: 1,
-        departmentId: 1,
-        intake: "43",
-        year: 2,
-        bio: "BT (Hons) in ICT, Intake 43 (Group 10). Mobile application development and software engineering.",
-        courses: [101, 103, 105, 106, 110], // ITIC1282, ITIC1260, ITIC1232, ITIC1252, ITIC2123
-        availability: ["Wed-2", "Fri-3", "Sun-2"]
-      },
-      {
-        id: "usr-nemanthi",
-        name: "K.V.H. Nemanthi",
-        email: "nemanthi.kvh@kdu.ac.lk",
-        indexNo: "D/ICT/26/0062",
-        role: "student",
-        facultyId: 1,
-        departmentId: 1,
-        intake: "43",
-        year: 2,
-        bio: "BT (Hons) in ICT, Intake 43 (Group 10). UI/UX design, web architecture, and cloud platforms.",
-        courses: [101, 102, 103, 109, 110], // ITIC1282, ITIC1242, ITIC1260, ITIC2113, ITIC2123
-        availability: ["Tue-2", "Wed-2", "Fri-3"]
-      },
-      {
-        id: "usr-kasun",
-        name: "Cadet Kasun Mendis",
-        email: "kasun@kdu.ac.lk",
-        indexNo: "C/ICT/26/0045",
-        role: "student",
-        facultyId: 1,
-        departmentId: 1,
-        intake: "43",
-        year: 2,
-        bio: "Officer Cadet, Intake 43. Algorithms & data structures peer study tutor.",
-        courses: [101, 102, 103, 104, 111], // ITIC1282, ITIC1242, ITIC1260, ITIC1212, DL1012
-        availability: ["Mon-3", "Wed-2", "Thu-2"]
-      },
-      {
-        id: "usr-admin",
-        name: "Maj. S. Jayawardena",
-        email: "admin@kdu.lk",
-        indexNo: "STAFF/FOT/01",
-        role: "admin",
-        facultyId: 1,
-        departmentId: 1,
-        intake: "43",
-        year: 4,
-        bio: "Academic Coordinator & Moderation Officer, Faculty of Technology.",
-        courses: [],
-        availability: []
-      }
-    ],
-    groups: [
-      {
-        id: "grp-sdp2-group-10",
-        name: "SDP II Group 10: StudyConnect Syndicate",
-        course: 101, // ITIC1282
-        leader: "usr-bandara",
-        max_members: 6,
-        is_open: true,
-        members: ["usr-bandara", "usr-perera", "usr-nethmini", "usr-dahanayaka", "usr-nemanthi"]
-      },
-      {
-        id: "grp-algomasters-ds",
-        name: "AlgoMasters: ITIC1242 Syndicate",
-        course: 102, // ITIC1242
-        leader: "usr-kasun",
-        max_members: 5,
-        is_open: true,
-        members: ["usr-kasun", "usr-nethmini"]
-      },
-      {
-        id: "grp-dbms-study",
-        name: "DBMS Query Optimization Circle",
-        course: 103, // ITIC1260
-        leader: "usr-nethmini",
-        max_members: 4,
-        is_open: true,
-        members: ["usr-nethmini", "usr-dahanayaka"]
-      }
-    ],
-    messages: {
-      "grp-sdp2-group-10": [
-        {
-          id: 1,
-          sender: "usr-bandara",
-          text: "Ayubowan team! As syndicate leader for Group 10, our SDP II repository and matching portal are configured.",
-          at: Date.now() - 3600000 * 5
-        },
-        {
-          id: 2,
-          sender: "usr-perera",
-          text: "Ayubowan Bandara! I tested the 60/40 algorithm and RLS security model. Everything is working smoothly.",
-          at: Date.now() - 3600000 * 3
-        },
-        {
-          id: 3,
-          sender: "usr-nethmini",
-          text: "Great work team. Let's run our scheduled mock evaluation this Wednesday.",
-          at: Date.now() - 3600000 * 2
-        }
-      ],
-      "grp-algomasters-ds": [
-        {
-          id: 4,
-          sender: "usr-kasun",
-          text: "Attention team: Whiteboard revision session on AVL Trees scheduled for Wednesday.",
-          at: Date.now() - 3600000 * 2
-        }
-      ]
-    },
-    sessions: [
-      {
-        id: "ses-1",
-        groupId: "grp-sdp2-group-10",
-        title: "SDP II Architecture & Viva Mock",
-        day: "Wed",
-        time: "14:30"
-      },
-      {
-        id: "ses-2",
-        groupId: "grp-algomasters-ds",
-        title: "AVL Trees & Balanced Trees Whiteboard",
-        day: "Wed",
-        time: "16:00"
-      }
-    ],
-    requests: [
-      {
-        id: "req-1",
-        type: "group",
-        from: "usr-kasun",
-        to: "usr-bandara",
-        groupId: "grp-sdp2-group-10",
-        status: "pending"
-      }
-    ],
+    users: [],
+    groups: [],
+    messages: {},
+    sessions: [],
+    requests: [],
     authUser: null
   };
 }
 
-const STORAGE_KEY = "kdu_studyconnect_state_v6";
+const STORAGE_KEY = "kdu_studyconnect_clean_v1";
 
 let state = null;
 let sbClient = null;
@@ -447,8 +268,12 @@ function loadStateFromStorage() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
+      if (parsed && Array.isArray(parsed.users)) {
         parsed.faculties = KDU_CATALOG; // ensure latest catalog is always active
+        if (!parsed.groups) parsed.groups = [];
+        if (!parsed.messages) parsed.messages = {};
+        if (!parsed.sessions) parsed.sessions = [];
+        if (!parsed.requests) parsed.requests = [];
         return parsed;
       }
     }
@@ -468,45 +293,259 @@ function saveStateToStorage(s) {
   }
 }
 
+function clearAllLocalData() {
+  localStorage.removeItem(STORAGE_KEY);
+  sessionStorage.removeItem("kdu_active_user_id");
+  state = getInitialSeedState();
+  saveStateToStorage(state);
+}
+
 // Initialize Supabase client if configured
-if (typeof isSupabaseConfigured === "function" && isSupabaseConfigured() && typeof supabase !== "undefined") {
+function initSupabaseClient() {
+  if (typeof isSupabaseConfigured === "function" && isSupabaseConfigured() && typeof supabase !== "undefined") {
+    try {
+      const url = typeof getSupabaseUrl === "function" ? getSupabaseUrl() : (typeof SUPABASE_URL !== "undefined" ? SUPABASE_URL : "");
+      const key = typeof getSupabaseAnonKey === "function" ? getSupabaseAnonKey() : (typeof SUPABASE_ANON_KEY !== "undefined" ? SUPABASE_ANON_KEY : "");
+      if (url && key) {
+        sbClient = supabase.createClient(url, key);
+      }
+    } catch (err) {
+      console.warn("Supabase client init error:", err);
+    }
+  }
+}
+initSupabaseClient();
+
+// Sync live collections from Supabase
+async function syncFromSupabase() {
+  if (!sbClient) return;
   try {
-    sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  } catch (err) {
-    console.warn("Supabase client init error, defaulting to local demo:", err);
+    // 1. Fetch Remote Profiles
+    const { data: remoteProfiles, error: pErr } = await sbClient.from("profiles").select("*");
+    if (!pErr && remoteProfiles && remoteProfiles.length) {
+      const { data: remoteCourses } = await sbClient.from("student_courses").select("*");
+      const { data: remoteAvail } = await sbClient.from("availability").select("*");
+
+      state.users = remoteProfiles.map(function (p) {
+        const uCourses = (remoteCourses || [])
+          .filter(function (rc) { return rc.student === p.id; })
+          .map(function (rc) { return Number(rc.course_id); });
+
+        const dayKeys = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const uAvail = (remoteAvail || [])
+          .filter(function (ra) { return ra.student === p.id; })
+          .map(function (ra) {
+            const dKey = dayKeys[ra.day_of_week] || "Mon";
+            const hour = parseInt(String(ra.start_time).split(":")[0], 10);
+            const slot = hour < 12 ? 1 : hour >= 17 ? 3 : 2;
+            return dKey + "-" + slot;
+          });
+
+        return {
+          id: p.id,
+          name: p.display_name || p.email.split("@")[0],
+          email: p.email,
+          indexNo: p.kdu_index_no || "",
+          role: p.role || "student",
+          facultyId: p.faculty_id || null,
+          departmentId: p.department_id || null,
+          intake: p.intake || "43",
+          year: p.year_of_study || 2,
+          bio: p.bio || "",
+          courses: uCourses,
+          availability: uAvail
+        };
+      });
+    }
+
+    // 2. Fetch Remote Groups & Group Members
+    const { data: remoteGroups, error: gErr } = await sbClient.from("groups").select("*, group_members(*)");
+    if (!gErr && remoteGroups) {
+      state.groups = remoteGroups.map(function (g) {
+        const members = (g.group_members || []).map(function (gm) { return gm.student; });
+        if (g.created_by && !members.includes(g.created_by)) {
+          members.push(g.created_by);
+        }
+        return {
+          id: g.id,
+          name: g.name,
+          course: g.course_id ? Number(g.course_id) : null,
+          leader: g.created_by,
+          max_members: g.max_members || 6,
+          is_open: g.is_open !== false,
+          members: members
+        };
+      });
+    }
+
+    // 3. Fetch Remote Messages
+    const { data: remoteMessages, error: mErr } = await sbClient
+      .from("messages")
+      .select("*")
+      .order("sent_at", { ascending: true });
+    if (!mErr && remoteMessages) {
+      state.messages = {};
+      remoteMessages.forEach(function (m) {
+        if (!state.messages[m.group_id]) state.messages[m.group_id] = [];
+        state.messages[m.group_id].push({
+          id: m.id,
+          sender: m.sender,
+          text: m.content,
+          at: new Date(m.sent_at).getTime()
+        });
+      });
+    }
+
+    // 4. Fetch Remote Study Sessions
+    const { data: remoteSessions, error: sErr } = await sbClient.from("study_sessions").select("*");
+    if (!sErr && remoteSessions) {
+      const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      state.sessions = remoteSessions.map(function (s) {
+        const d = new Date(s.starts_at);
+        const dayKey = dayNames[d.getDay()] || "Wed";
+        const hours = String(d.getHours()).padStart(2, "0");
+        const mins = String(d.getMinutes()).padStart(2, "0");
+        return {
+          id: String(s.id),
+          groupId: s.group_id,
+          title: s.title,
+          day: dayKey,
+          time: hours + ":" + mins
+        };
+      });
+    }
+
+    // 5. Fetch Remote Join Requests
+    const { data: remoteRequests, error: rErr } = await sbClient.from("join_requests").select("*, groups(created_by)");
+    if (!rErr && remoteRequests) {
+      state.requests = remoteRequests.map(function (r) {
+        return {
+          id: "req-" + r.id,
+          rawId: r.id,
+          type: "group",
+          from: r.student,
+          to: r.groups ? r.groups.created_by : null,
+          groupId: r.group_id,
+          status: r.status
+        };
+      });
+    }
+
+    saveStateToStorage();
+  } catch (e) {
+    console.warn("Supabase data sync notice:", e);
   }
 }
 
 async function initBackend() {
+  if (!sbClient) initSupabaseClient();
   state = loadStateFromStorage();
 
   if (sbClient) {
     try {
       const { data: { session } } = await sbClient.auth.getSession();
       if (session && session.user) {
-        let user = userById(session.user.id) || userByEmail(session.user.email);
+        const userEmail = (session.user.email || "").trim().toLowerCase();
+
+        // Strict University Domain Restriction: must end with @kdu.ac.lk
+        if (!userEmail.endsWith("@kdu.ac.lk")) {
+          await sbClient.auth.signOut();
+          sessionStorage.removeItem("kdu_active_user_id");
+          state.authUser = null;
+          saveStateToStorage();
+          if (window.history.replaceState && window.location.hash.includes("access_token")) {
+            window.history.replaceState(null, null, window.location.pathname);
+          }
+          if (typeof showToast === "function") {
+            showToast("Access restricted: Only official university accounts ending with @kdu.ac.lk are permitted.", true);
+          }
+          return false;
+        }
+
+        // Fetch or create profile in Supabase
+        let user = null;
+        try {
+          const { data: profile } = await sbClient.from("profiles").select("*").eq("id", session.user.id).maybeSingle();
+          if (profile) {
+            user = {
+              id: profile.id,
+              name: profile.display_name || session.user.user_metadata?.full_name || session.user.user_metadata?.name || userEmail.split("@")[0],
+              email: profile.email || userEmail,
+              indexNo: profile.kdu_index_no || "",
+              role: profile.role || (userEmail.includes("admin") || userEmail.startsWith("staff") ? "admin" : "student"),
+              facultyId: profile.faculty_id || null,
+              departmentId: profile.department_id || null,
+              intake: profile.intake || "43",
+              year: profile.year_of_study || 2,
+              bio: profile.bio || "",
+              courses: [],
+              availability: []
+            };
+
+            const { data: sc } = await sbClient.from("student_courses").select("course_id").eq("student", user.id);
+            if (sc) user.courses = sc.map(function (c) { return Number(c.course_id); });
+
+            const { data: av } = await sbClient.from("availability").select("day_of_week, start_time").eq("student", user.id);
+            if (av) {
+              const dayKeys = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+              user.availability = av.map(function (item) {
+                const dKey = dayKeys[item.day_of_week] || "Mon";
+                const hour = parseInt(String(item.start_time).split(":")[0], 10);
+                const slot = hour < 12 ? 1 : hour >= 17 ? 3 : 2;
+                return dKey + "-" + slot;
+              });
+            }
+          }
+        } catch (pe) {
+          console.warn("Error fetching Supabase profile:", pe);
+        }
+
         if (!user) {
           user = {
             id: session.user.id,
-            name: session.user.user_metadata?.name || session.user.email.split("@")[0],
-            email: session.user.email,
-            indexNo: session.user.user_metadata?.index_no || "D/ICT/23/0001",
-            role: "student",
-            facultyId: 1,
-            departmentId: 1,
+            name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || userEmail.split("@")[0],
+            email: userEmail,
+            indexNo: session.user.user_metadata?.index_no || "",
+            role: userEmail.includes("admin") || userEmail.startsWith("staff") ? "admin" : "student",
+            facultyId: null,
+            departmentId: null,
             intake: "43",
             year: 2,
-            courses: [101, 102, 103],
-            availability: ["Wed-2", "Fri-3"]
+            bio: "",
+            courses: [],
+            availability: []
           };
-          state.users.push(user);
-          saveStateToStorage();
+          try {
+            await sbClient.from("profiles").upsert({
+              id: session.user.id,
+              email: userEmail,
+              display_name: user.name,
+              role: user.role
+            }, { onConflict: "id" });
+          } catch (upErr) {}
         }
+
+        const existingIdx = state.users.findIndex(function (u) { return u.id === user.id || u.email.toLowerCase() === userEmail; });
+        if (existingIdx >= 0) {
+          state.users[existingIdx] = Object.assign({}, state.users[existingIdx], user);
+          user = state.users[existingIdx];
+        } else {
+          state.users.push(user);
+        }
+
         state.authUser = user;
+        sessionStorage.setItem("kdu_active_user_id", user.id);
+        saveStateToStorage();
+
+        if (window.history.replaceState && window.location.hash.includes("access_token")) {
+          window.history.replaceState(null, null, window.location.pathname);
+        }
+
+        await syncFromSupabase();
         return true;
       }
     } catch (e) {
-      console.warn("Supabase session check failed, using local auth:", e);
+      console.warn("Supabase session check notice:", e);
     }
   }
 
@@ -579,6 +618,8 @@ function profileComplete(user) {
     user &&
     user.facultyId &&
     user.departmentId &&
+    user.indexNo &&
+    user.indexNo.trim().length > 0 &&
     Array.isArray(user.courses) &&
     user.courses.length > 0 &&
     Array.isArray(user.availability) &&
@@ -607,45 +648,72 @@ function requireAdmin() {
 
 // ---------- Authentication Operations ----------
 
+async function signInWithGoogle() {
+  if (!sbClient) initSupabaseClient();
+  if (!sbClient) {
+    return "Supabase is not configured. Please paste your SUPABASE_URL and SUPABASE_ANON_KEY into config.js.";
+  }
+  const redirectUrl = window.location.origin + window.location.pathname;
+  const { data, error } = await sbClient.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: redirectUrl,
+      queryParams: {
+        hd: "kdu.ac.lk", // Restricts Google account selector to @kdu.ac.lk Google Workspace accounts
+        prompt: "select_account"
+      }
+    }
+  });
+  if (error) return error.message;
+  return null;
+}
+
 async function signIn(email, password) {
-  if (!email || !password) return "Please enter your email and password.";
+  if (!email || !password) return "Please enter your university email and password.";
   const cleanEmail = email.trim().toLowerCase();
+
+  // Enforce @kdu.ac.lk restriction
+  if (!cleanEmail.endsWith("@kdu.ac.lk")) {
+    return "Access restricted: Only official university accounts ending with @kdu.ac.lk are permitted.";
+  }
 
   // 1. If Supabase configured, attempt live auth
   if (sbClient) {
     try {
       const { data, error } = await sbClient.auth.signInWithPassword({ email: cleanEmail, password: password });
       if (error) return error.message;
-      let user = userByEmail(cleanEmail);
+      let user = userById(data.user.id) || userByEmail(cleanEmail);
       if (!user) {
         user = {
           id: data.user.id,
-          name: data.user.user_metadata?.name || cleanEmail.split("@")[0],
+          name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || cleanEmail.split("@")[0],
           email: cleanEmail,
-          indexNo: data.user.user_metadata?.index_no || "D/ICT/23/0001",
-          role: "student",
-          facultyId: 1,
-          departmentId: 1,
+          indexNo: data.user.user_metadata?.index_no || "",
+          role: cleanEmail.includes("admin") || cleanEmail.startsWith("staff") ? "admin" : "student",
+          facultyId: null,
+          departmentId: null,
           intake: "43",
           year: 2,
-          courses: [101, 102, 103],
-          availability: ["Wed-2", "Fri-3"]
+          courses: [],
+          availability: []
         };
         state.users.push(user);
       }
       state.authUser = user;
       sessionStorage.setItem("kdu_active_user_id", user.id);
       saveStateToStorage();
+      await syncFromSupabase();
       return null;
     } catch (e) {
-      console.warn("Supabase live signIn error, checking local store:", e);
+      console.warn("Supabase live signIn notice:", e);
+      return e.message || "Failed to sign in.";
     }
   }
 
-  // 2. Demo / Local Auth
+  // 2. Local fallback if Supabase not configured
   const existing = userByEmail(cleanEmail);
   if (!existing) {
-    return "Account not found with this email. Please register or use Quick Demo.";
+    return "Account not found with this email. Please register your @kdu.ac.lk account first.";
   }
   state.authUser = existing;
   sessionStorage.setItem("kdu_active_user_id", existing.id);
@@ -660,6 +728,11 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
   const cleanEmail = email.trim().toLowerCase();
   const cleanIndex = indexNo.trim().toUpperCase();
 
+  // Enforce @kdu.ac.lk restriction
+  if (!cleanEmail.endsWith("@kdu.ac.lk")) {
+    return "Access restricted: Registration is exclusively permitted for university accounts ending with @kdu.ac.lk.";
+  }
+
   // Validate index prefix
   if (!cleanIndex.startsWith("D") && !cleanIndex.startsWith("C") && !cleanIndex.startsWith("STAFF")) {
     return "KDU Index Number must start with 'D' (Day Scholar) or 'C' (Officer Cadet).";
@@ -670,7 +743,25 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
     return "An account with this email address already exists.";
   }
 
-  const newId = "usr-" + Date.now();
+  let newId = "usr-" + Date.now();
+
+  if (sbClient) {
+    try {
+      const { data, error } = await sbClient.auth.signUp({
+        email: cleanEmail,
+        password: password,
+        options: { data: { full_name: name.trim(), name: name.trim(), index_no: cleanIndex } }
+      });
+      if (error) return error.message;
+      if (data && data.user) {
+        newId = data.user.id;
+      }
+    } catch (e) {
+      console.warn("Supabase live signUp notice:", e);
+      return e.message || "Failed to register account with Supabase.";
+    }
+  }
+
   const newUser = {
     id: newId,
     name: name.trim(),
@@ -682,19 +773,25 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
     intake: String(intake || "43"),
     year: 2,
     bio: "",
-    courses: [101, 102], // Default enrollment in core FOT ICT
-    availability: ["Wed-2", "Fri-3"]
+    courses: [],
+    availability: []
   };
 
   if (sbClient) {
     try {
-      await sbClient.auth.signUp({
-        email: cleanEmail,
-        password: password,
-        options: { data: { name: newUser.name, index_no: newUser.indexNo } }
-      });
+      await sbClient.from("profiles").upsert({
+        id: newUser.id,
+        display_name: newUser.name,
+        email: newUser.email,
+        kdu_index_no: newUser.indexNo,
+        faculty_id: newUser.facultyId,
+        department_id: newUser.departmentId,
+        intake: newUser.intake,
+        year_of_study: newUser.year,
+        role: newUser.role
+      }, { onConflict: "id" });
     } catch (e) {
-      console.warn("Supabase live signUp notice:", e);
+      console.warn("Supabase profile create notice:", e);
     }
   }
 
@@ -744,6 +841,42 @@ async function updateUserProfile(id, patch) {
         year_of_study: u.year,
         bio: u.bio
       }).eq("id", id);
+
+      // Sync student_courses
+      if (Array.isArray(patch.courses)) {
+        await sbClient.from("student_courses").delete().eq("student", id);
+        if (u.courses.length > 0) {
+          await sbClient.from("student_courses").insert(
+            u.courses.map(function (cid) { return { student: id, course_id: cid }; })
+          );
+        }
+      }
+
+      // Sync availability
+      if (Array.isArray(patch.availability)) {
+        await sbClient.from("availability").delete().eq("student", id);
+        if (u.availability.length > 0) {
+          const dayMap = { "Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6 };
+          const slotTimes = {
+            1: { start: "08:00:00", end: "12:00:00" },
+            2: { start: "12:00:00", end: "17:00:00" },
+            3: { start: "17:00:00", end: "21:00:00" }
+          };
+          const availRows = u.availability.map(function (slotStr) {
+            const parts = String(slotStr).split("-");
+            const d = dayMap[parts[0]] !== undefined ? dayMap[parts[0]] : 1;
+            const sId = Number(parts[1]) || 2;
+            const timeInfo = slotTimes[sId] || slotTimes[2];
+            return {
+              student: id,
+              day_of_week: d,
+              start_time: timeInfo.start,
+              end_time: timeInfo.end
+            };
+          });
+          await sbClient.from("availability").insert(availRows);
+        }
+      }
     } catch (e) {
       console.warn("Supabase profile sync notice:", e);
     }
@@ -810,6 +943,18 @@ async function requestToJoinGroup(user, groupId) {
   });
   if (dup) return "Your join request is already pending approval.";
 
+  if (sbClient) {
+    try {
+      await sbClient.from("join_requests").insert({
+        group_id: groupId,
+        student: user.id,
+        status: "pending"
+      });
+    } catch (e) {
+      console.warn("Supabase join request notice:", e);
+    }
+  }
+
   const newReq = {
     id: "req-" + Date.now(),
     type: "group",
@@ -828,6 +973,14 @@ async function setRequestStatus(id, status) {
   if (!r) return "Request not found.";
   r.status = status;
   saveStateToStorage();
+
+  if (sbClient && r.rawId) {
+    try {
+      await sbClient.from("join_requests").update({ status: status }).eq("id", r.rawId);
+    } catch (e) {
+      console.warn("Supabase setRequestStatus notice:", e);
+    }
+  }
   return null;
 }
 
@@ -846,6 +999,24 @@ async function approveJoinRequest(requestId) {
   }
   r.status = "approved";
   saveStateToStorage();
+
+  if (sbClient) {
+    try {
+      if (r.rawId) {
+        await sbClient.from("join_requests").update({ status: "approved" }).eq("id", r.rawId);
+      }
+      await sbClient.from("group_members").insert({
+        group_id: g.id,
+        student: r.from,
+        role: "member"
+      });
+      if (g.members.length >= g.max_members) {
+        await sbClient.from("groups").update({ is_open: false }).eq("id", g.id);
+      }
+    } catch (e) {
+      console.warn("Supabase approve request notice:", e);
+    }
+  }
   return null;
 }
 
@@ -863,26 +1034,38 @@ async function acceptPartnerRequest(requestId) {
   const courseTitle = shared.length ? courseById(shared[0])?.code + " " : "";
   const groupName = courseTitle + me.name.split(" ")[0] + " & " + other.name.split(" ")[0] + " Syndicate";
 
-  const newGroup = {
-    id: "grp-" + Date.now(),
-    name: groupName,
-    course: shared.length ? shared[0] : null,
-    leader: me.id,
-    max_members: 4,
-    is_open: true,
-    members: [me.id, other.id]
-  };
-
-  state.groups.push(newGroup);
-  r.status = "approved";
-  saveStateToStorage();
-  return null;
+  return await createGroup(groupName, shared.length ? shared[0] : null, 4, me.id);
 }
 
 async function createGroup(name, courseId, maxMembers, leaderId) {
   if (!name.trim()) return "Group name is required.";
+  let groupId = "grp-" + Date.now();
+
+  if (sbClient) {
+    try {
+      const { data: ins, error } = await sbClient.from("groups").insert({
+        name: name.trim(),
+        course_id: courseId ? Number(courseId) : null,
+        max_members: Math.max(2, Math.min(10, Number(maxMembers) || 6)),
+        created_by: leaderId,
+        is_open: true
+      }).select().single();
+
+      if (!error && ins) {
+        groupId = ins.id;
+        await sbClient.from("group_members").insert({
+          group_id: groupId,
+          student: leaderId,
+          role: "leader"
+        });
+      }
+    } catch (e) {
+      console.warn("Supabase create group notice:", e);
+    }
+  }
+
   const newGroup = {
-    id: "grp-" + Date.now(),
+    id: groupId,
     name: name.trim(),
     course: courseId ? Number(courseId) : null,
     leader: leaderId,
@@ -897,8 +1080,37 @@ async function createGroup(name, courseId, maxMembers, leaderId) {
 
 async function addStudySession(groupId, title, day, time) {
   if (!title.trim() || !day || !time) return "Session title, day, and time are required.";
+
+  let sessionId = "ses-" + Date.now();
+
+  if (sbClient) {
+    try {
+      const dayMap = { "Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6 };
+      const targetDay = dayMap[day] !== undefined ? dayMap[day] : 3;
+      const now = new Date();
+      const currentDay = now.getDay();
+      let diffDays = (targetDay - currentDay + 7) % 7;
+      if (diffDays === 0) diffDays = 7;
+      const sessionDate = new Date(now.getTime() + diffDays * 86400000);
+      const parts = time.split(":");
+      sessionDate.setHours(Number(parts[0]) || 14, Number(parts[1]) || 0, 0, 0);
+
+      const { data: ins, error } = await sbClient.from("study_sessions").insert({
+        group_id: groupId,
+        title: title.trim(),
+        starts_at: sessionDate.toISOString(),
+        duration_mins: 60,
+        created_by: state.authUser ? state.authUser.id : null
+      }).select().single();
+
+      if (!error && ins) sessionId = String(ins.id);
+    } catch (e) {
+      console.warn("Supabase add session notice:", e);
+    }
+  }
+
   const newSession = {
-    id: "ses-" + Date.now(),
+    id: sessionId,
     groupId: groupId,
     title: title.trim(),
     day: day,
@@ -914,6 +1126,14 @@ async function setGroupOpenStatus(groupId, isOpen) {
   if (!g) return "Group not found.";
   g.is_open = !!isOpen;
   saveStateToStorage();
+
+  if (sbClient) {
+    try {
+      await sbClient.from("groups").update({ is_open: g.is_open }).eq("id", groupId);
+    } catch (e) {
+      console.warn("Supabase setGroupOpenStatus notice:", e);
+    }
+  }
   return null;
 }
 

@@ -206,6 +206,17 @@ function renderHeader(activePageKey) {
 // ---------- Page Controller: Authentication (index.html) ----------
 
 function initAuthPage() {
+  // If user is already authenticated (e.g. from Google OAuth callback or active session)
+  const activeUser = currentUser();
+  if (activeUser) {
+    if (!profileComplete(activeUser)) {
+      location.href = "profile.html";
+      return;
+    }
+    location.href = (activeUser.role === "admin") ? "admin.html" : "dashboard.html";
+    return;
+  }
+
   const signinTab = $("#tab-signin");
   const registerTab = $("#tab-register");
   const signinPanel = $("#panel-signin");
@@ -233,6 +244,38 @@ function initAuthPage() {
   if (signinTab) signinTab.addEventListener("click", function () { switchTab("signin"); });
   if (registerTab) registerTab.addEventListener("click", function () { switchTab("register"); });
 
+  // Google OAuth Handlers (@kdu.ac.lk)
+  async function triggerGoogleOAuth(buttonEl, originalText) {
+    if (buttonEl) {
+      buttonEl.disabled = true;
+      buttonEl.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span> Connecting to Google...';
+    }
+    const err = await signInWithGoogle();
+    if (err) {
+      if (buttonEl) {
+        buttonEl.disabled = false;
+        buttonEl.innerHTML = originalText;
+      }
+      showToast(err, true);
+    }
+  }
+
+  const googleSigninBtn = $("#btn-google-signin");
+  if (googleSigninBtn) {
+    const origText = googleSigninBtn.innerHTML;
+    googleSigninBtn.addEventListener("click", function () {
+      triggerGoogleOAuth(googleSigninBtn, origText);
+    });
+  }
+
+  const googleRegisterBtn = $("#btn-google-register");
+  if (googleRegisterBtn) {
+    const origText = googleRegisterBtn.innerHTML;
+    googleRegisterBtn.addEventListener("click", function () {
+      triggerGoogleOAuth(googleRegisterBtn, origText);
+    });
+  }
+
   // Sign In Action
   const signinBtn = $("#btn-do-signin");
   if (signinBtn) {
@@ -241,6 +284,10 @@ function initAuthPage() {
       const password = ($("#signin-password")?.value || "").trim();
       if (!email || !password) {
         showToast("Please enter both university email and password.", true);
+        return;
+      }
+      if (!email.toLowerCase().endsWith("@kdu.ac.lk")) {
+        showToast("Access restricted: Only official accounts ending with @kdu.ac.lk are allowed.", true);
         return;
       }
       signinBtn.disabled = true;
@@ -252,7 +299,11 @@ function initAuthPage() {
         showToast(err, true);
       } else {
         const u = currentUser();
-        location.href = (u && u.role === "admin") ? "admin.html" : "dashboard.html";
+        if (!profileComplete(u)) {
+          location.href = "profile.html";
+        } else {
+          location.href = (u && u.role === "admin") ? "admin.html" : "dashboard.html";
+        }
       }
     });
   }
@@ -273,6 +324,11 @@ function initAuthPage() {
         return;
       }
 
+      if (!email.toLowerCase().endsWith("@kdu.ac.lk")) {
+        showToast("Access restricted: Registration is exclusively for @kdu.ac.lk university accounts.", true);
+        return;
+      }
+
       registerBtn.disabled = true;
       registerBtn.textContent = "Verifying & Creating...";
       const err = await signUp(name, indexNo, email, password, facultyId, 1, intake);
@@ -284,37 +340,6 @@ function initAuthPage() {
         showToast("Account registered! Directing to profile builder...");
         setTimeout(function () { location.href = "profile.html"; }, 500);
       }
-    });
-  }
-
-  // Quick Demo Fill Handlers
-  const quickCadet = $("#quick-login-cadet");
-  if (quickCadet) {
-    quickCadet.addEventListener("click", async function () {
-      $("#signin-email").value = "bandara.nrhd@kdu.ac.lk";
-      $("#signin-password").value = "demo123";
-      await signIn("bandara.nrhd@kdu.ac.lk", "demo123");
-      location.href = "dashboard.html";
-    });
-  }
-
-  const quickOfficer = $("#quick-login-officer");
-  if (quickOfficer) {
-    quickOfficer.addEventListener("click", async function () {
-      $("#signin-email").value = "nethmini.was@kdu.ac.lk";
-      $("#signin-password").value = "demo123";
-      await signIn("nethmini.was@kdu.ac.lk", "demo123");
-      location.href = "dashboard.html";
-    });
-  }
-
-  const quickAdmin = $("#quick-login-admin");
-  if (quickAdmin) {
-    quickAdmin.addEventListener("click", async function () {
-      $("#signin-email").value = "admin@kdu.lk";
-      $("#signin-password").value = "demo123";
-      await signIn("admin@kdu.lk", "demo123");
-      location.href = "admin.html";
     });
   }
 }
