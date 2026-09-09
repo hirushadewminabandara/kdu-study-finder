@@ -256,7 +256,11 @@ function initAuthPage() {
         buttonEl.disabled = false;
         buttonEl.innerHTML = originalText;
       }
-      showToast(err, true);
+      if (typeof err === "string" && err.toLowerCase().includes("provider is not enabled")) {
+        showToast("Google Login is not enabled in your Supabase project yet. Please use the Email & Password form below.", true);
+      } else {
+        showToast(err, true);
+      }
     }
   }
 
