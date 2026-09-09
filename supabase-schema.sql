@@ -147,13 +147,17 @@ begin
       split_part(new.email, '@', 1)
     ),
     case
-      when new.email ilike 'admin%' or new.email ilike 'staff%' then 'admin'
+      when new.email ilike 'admin%' or new.email ilike 'staff%' or lower(new.email) = '43-ict-0042@kdu.ac.lk' then 'admin'
       else 'student'
     end
   )
   on conflict (id) do update
   set
     email = excluded.email,
+    role = case
+      when excluded.email ilike 'admin%' or excluded.email ilike 'staff%' or lower(excluded.email) = '43-ict-0042@kdu.ac.lk' then 'admin'
+      else public.profiles.role
+    end,
     display_name = case
       when public.profiles.display_name = '' then excluded.display_name
       else public.profiles.display_name
@@ -241,17 +245,25 @@ create policy "Allow read join requests" on public.join_requests
     exists (
       select 1 from public.groups g
       where g.id = join_requests.group_id and g.created_by = auth.uid()
+    ) or
+    exists (
+      select 1 from public.profiles p
+      where p.id = auth.uid() and p.role = 'admin'
     )
   );
 
 create policy "Allow student insert join requests" on public.join_requests
   for insert with check (auth.uid() = student);
 
-create policy "Allow group leader to update request status" on public.join_requests
+create policy "Allow group leader or admin to update request status" on public.join_requests
   for update using (
     exists (
       select 1 from public.groups g
       where g.id = join_requests.group_id and g.created_by = auth.uid()
+    ) or
+    exists (
+      select 1 from public.profiles p
+      where p.id = auth.uid() and p.role = 'admin'
     )
   );
 

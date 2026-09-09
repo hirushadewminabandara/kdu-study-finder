@@ -392,6 +392,17 @@ const KDU_CATALOG = [
   }
 ];
 
+// Whitelisted Administrator Accounts
+const ADMIN_EMAILS = [
+  "43-ict-0042@kdu.ac.lk"
+];
+
+function isAdminEmail(email) {
+  if (!email) return false;
+  const clean = String(email).trim().toLowerCase();
+  return clean.includes("admin") || clean.startsWith("staff") || ADMIN_EMAILS.includes(clean);
+}
+
 // Student Categorization Rule:
 // Index starting with 'C' = Officer Cadet
 // Index starting with 'D' = Day Scholar
@@ -437,6 +448,12 @@ function loadStateFromStorage() {
         if (!parsed.messages) parsed.messages = {};
         if (!parsed.sessions) parsed.sessions = [];
         if (!parsed.requests) parsed.requests = [];
+        parsed.users.forEach(function (u) {
+          if (isAdminEmail(u.email)) u.role = "admin";
+        });
+        if (parsed.authUser && isAdminEmail(parsed.authUser.email)) {
+          parsed.authUser.role = "admin";
+        }
         return parsed;
       }
     }
@@ -504,12 +521,13 @@ async function syncFromSupabase() {
             return dKey + "-" + slot;
           });
 
+        const isAdm = isAdminEmail(p.email) || p.role === "admin";
         return {
           id: p.id,
           name: p.display_name || p.email.split("@")[0],
           email: p.email,
           indexNo: p.kdu_index_no || "",
-          role: p.role || "student",
+          role: isAdm ? "admin" : (p.role || "student"),
           facultyId: p.faculty_id || null,
           departmentId: p.department_id || null,
           intake: p.intake || "43",
@@ -630,12 +648,13 @@ async function initBackend() {
         try {
           const { data: profile } = await sbClient.from("profiles").select("*").eq("id", session.user.id).maybeSingle();
           if (profile) {
+            const isAdm = isAdminEmail(userEmail) || profile.role === "admin";
             user = {
               id: profile.id,
               name: profile.display_name || session.user.user_metadata?.full_name || session.user.user_metadata?.name || userEmail.split("@")[0],
               email: profile.email || userEmail,
               indexNo: profile.kdu_index_no || "",
-              role: profile.role || (userEmail.includes("admin") || userEmail.startsWith("staff") ? "admin" : "student"),
+              role: isAdm ? "admin" : (profile.role || "student"),
               facultyId: profile.faculty_id || null,
               departmentId: profile.department_id || null,
               intake: profile.intake || "43",
@@ -644,6 +663,11 @@ async function initBackend() {
               courses: [],
               availability: []
             };
+
+            // Auto-promote in Supabase profiles if whitelisted
+            if (isAdm && profile.role !== "admin") {
+              try { sbClient.from("profiles").update({ role: "admin" }).eq("id", profile.id).then(function () {}); } catch (e) {}
+            }
 
             const { data: sc } = await sbClient.from("student_courses").select("course_id").eq("student", user.id);
             if (sc) user.courses = sc.map(function (c) { return Number(c.course_id); });
@@ -664,12 +688,13 @@ async function initBackend() {
         }
 
         if (!user) {
+          const isAdm = isAdminEmail(userEmail);
           user = {
             id: session.user.id,
             name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || userEmail.split("@")[0],
             email: userEmail,
             indexNo: session.user.user_metadata?.index_no || "",
-            role: userEmail.includes("admin") || userEmail.startsWith("staff") ? "admin" : "student",
+            role: isAdm ? "admin" : "student",
             facultyId: null,
             departmentId: null,
             intake: "43",
@@ -759,12 +784,16 @@ function deptById(id) {
 }
 
 function userById(id) {
-  return db().users.find(function (u) { return u.id === id; }) || null;
+  const u = db().users.find(function (x) { return x.id === id; }) || null;
+  if (u && isAdminEmail(u.email)) u.role = "admin";
+  return u;
 }
 
 function userByEmail(email) {
   if (!email) return null;
-  return db().users.find(function (u) { return String(u.email).toLowerCase() === String(email).trim().toLowerCase(); }) || null;
+  const u = db().users.find(function (x) { return String(x.email).toLowerCase() === String(email).trim().toLowerCase(); }) || null;
+  if (u && isAdminEmail(u.email)) u.role = "admin";
+  return u;
 }
 
 function groupById(id) {
@@ -773,7 +802,10 @@ function groupById(id) {
 
 function currentUser() {
   if (!state) state = loadStateFromStorage();
-  return state.authUser;
+  if (state && state.authUser && isAdminEmail(state.authUser.email)) {
+    state.authUser.role = "admin";
+  }
+  return state ? state.authUser : null;
 }
 
 function profileComplete(user) {
@@ -802,6 +834,9 @@ function requireLogin() {
 function requireAdmin() {
   const user = requireLogin();
   if (!user) return null;
+  if (isAdminEmail(user.email)) {
+    user.role = "admin";
+  }
   if (user.role !== "admin") {
     location.href = "dashboard.html";
     return null;
@@ -852,7 +887,7 @@ async function signIn(email, password) {
           name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || cleanEmail.split("@")[0],
           email: cleanEmail,
           indexNo: data.user.user_metadata?.index_no || "",
-          role: cleanEmail.includes("admin") || cleanEmail.startsWith("staff") ? "admin" : "student",
+          role: isAdminEmail(cleanEmail) ? "admin" : "student",
           facultyId: null,
           departmentId: null,
           intake: "43",
@@ -861,6 +896,8 @@ async function signIn(email, password) {
           availability: []
         };
         state.users.push(user);
+      } else if (isAdminEmail(cleanEmail)) {
+        user.role = "admin";
       }
       state.authUser = user;
       sessionStorage.setItem("kdu_active_user_id", user.id);
@@ -877,6 +914,9 @@ async function signIn(email, password) {
   const existing = userByEmail(cleanEmail);
   if (!existing) {
     return "Account not found with this email. Please register your @kdu.ac.lk account first.";
+  }
+  if (isAdminEmail(cleanEmail)) {
+    existing.role = "admin";
   }
   state.authUser = existing;
   sessionStorage.setItem("kdu_active_user_id", existing.id);
@@ -930,7 +970,7 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
     name: name.trim(),
     email: cleanEmail,
     indexNo: cleanIndex,
-    role: cleanEmail.includes("admin") || cleanIndex.startsWith("STAFF") ? "admin" : "student",
+    role: isAdminEmail(cleanEmail) || cleanIndex.startsWith("STAFF") ? "admin" : "student",
     facultyId: Number(facultyId) || 1,
     departmentId: Number(departmentId) || 1,
     intake: String(intake || "43"),
