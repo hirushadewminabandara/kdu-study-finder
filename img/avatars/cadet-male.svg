@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bg-cadet-m" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#123356"/>
+      <stop offset="100%" stop-color="#1e4e7e"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f8c9a3"/>
+      <stop offset="100%" stop-color="#e2a77b"/>
+    </linearGradient>
+    <linearGradient id="beret" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#091b2c"/>
+      <stop offset="100%" stop-color="#162e4a"/>
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="64" fill="url(#bg-cadet-m)"/>
+  <path d="M18 128 C20 100, 38 88, 64 88 C90 88, 108 100, 110 128 Z" fill="#0c233c"/>
+  <path d="M22 108 L40 96 L44 102 L26 114 Z" fill="#1b3d63"/>
+  <circle cx="34" cy="103" r="2.5" fill="#f5b82e"/>
+  <path d="M106 108 L88 96 L84 102 L102 114 Z" fill="#1b3d63"/>
+  <circle cx="94" cy="103" r="2.5" fill="#f5b82e"/>
+  <path d="M52 88 L64 104 L76 88 Z" fill="#ffffff"/>
+  <path d="M60 97 L68 97 L66 122 L62 122 Z" fill="#765a00"/>
+  <rect x="54" y="68" width="20" height="24" rx="4" fill="url(#skin)"/>
+  <ellipse cx="64" cy="56" rx="22" ry="26" fill="url(#skin)"/>
+  <ellipse cx="42" cy="58" rx="4" ry="7" fill="url(#skin)"/>
+  <ellipse cx="86" cy="58" rx="4" ry="7" fill="url(#skin)"/>
+  <ellipse cx="54" cy="56" rx="2.5" ry="3.5" fill="#1e293b"/>
+  <ellipse cx="74" cy="56" rx="2.5" ry="3.5" fill="#1e293b"/>
+  <path d="M49 48 Q54 46 59 49" stroke="#372618" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M69 49 Q74 46 79 48" stroke="#372618" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M64 57 L62 64 L66 64" stroke="#c98a5e" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M57 71 Q64 76 71 71" stroke="#a35f38" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M38 46 C38 28, 70 20, 88 32 C96 38, 94 48, 86 50 C78 52, 42 52, 38 46 Z" fill="url(#beret)"/>
+  <path d="M40 48 C50 49, 78 49, 88 47" stroke="#102133" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <ellipse cx="50" cy="38" rx="4.5" ry="5.5" fill="#f5b82e"/>
+  <circle cx="50" cy="38" r="2.5" fill="#ba1a1a"/>
+</svg>

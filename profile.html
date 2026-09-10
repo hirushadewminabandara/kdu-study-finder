@@ -76,13 +76,54 @@
       <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 shadow-sm p-6 sm:p-8 flex flex-col gap-8">
         
         <!-- SECTION 1: Personal Information -->
-        <section class="flex flex-col gap-4">
+        <section class="flex flex-col gap-5">
           <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 rounded bg-surface-container text-primary text-xs font-bold flex items-center justify-center">1</span>
               <h2 class="text-base font-bold text-primary">Personal Details &amp; Registration</h2>
             </div>
             <span class="text-[11px] uppercase tracking-wider text-on-surface-variant font-medium">Identity Records</span>
+          </div>
+
+          <!-- Profile Picture Studio Card -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-surface-container-low/60 border border-outline-variant/60 flex flex-col md:flex-row items-center md:items-start gap-5">
+            <!-- Avatar Live Preview -->
+            <div class="flex flex-col items-center gap-2 shrink-0">
+              <div id="profile-avatar-preview" class="relative group cursor-pointer shadow-sm rounded-full">
+                <!-- Rendered dynamically by app.js -->
+              </div>
+              <span class="text-[11px] font-semibold text-on-surface-variant">Profile Photo</span>
+            </div>
+
+            <!-- Avatar Controls -->
+            <div class="flex-grow flex flex-col gap-3 w-full">
+              <div class="flex flex-wrap items-center gap-2.5">
+                <input type="file" id="avatarFileInput" accept="image/png, image/jpeg, image/webp, image/svg+xml" class="hidden">
+                <button type="button" id="btn-upload-photo" class="px-3.5 py-2 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary-container transition-colors flex items-center gap-1.5 shadow-sm">
+                  <span class="material-symbols-outlined text-[16px]">upload</span>
+                  <span>Upload Photo</span>
+                </button>
+                <button type="button" id="btn-remove-photo" class="px-3.5 py-2 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:text-error hover:border-error text-xs font-semibold transition-colors flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px]">delete</span>
+                  <span>Reset to Initials</span>
+                </button>
+                <span class="text-[11px] text-outline ml-auto hidden sm:inline">JPG, PNG, or WebP. Auto-compressed</span>
+              </div>
+
+              <!-- Or custom URL input -->
+              <div class="flex items-center gap-2 w-full">
+                <span class="text-xs text-on-surface-variant shrink-0 font-medium">Or Image URL:</span>
+                <input id="avatarUrlInput" type="url" placeholder="https://example.com/photo.jpg or choose a preset below" class="h-9 px-3 text-xs text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors flex-grow">
+              </div>
+
+              <!-- Quick KDU Preset Avatars -->
+              <div class="flex flex-col gap-1.5 pt-1">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Or Select a KDU Preset Avatar:</span>
+                <div id="avatar-presets-grid" class="flex flex-wrap items-center gap-2">
+                  <!-- Rendered dynamically by app.js -->
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">

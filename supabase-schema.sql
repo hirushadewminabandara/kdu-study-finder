@@ -41,11 +41,15 @@ create table if not exists public.profiles (
   department_id int references public.departments(id),
   intake text default '43',
   year_of_study int default 2,
+  avatar_url text default '',
   bio text default '',
   role text not null default 'student' check (role in ('student', 'admin')),
   created_at timestamptz default now(),
   constraint check_kdu_email check (email ilike '%@kdu.ac.lk' or email ilike '%@%.kdu.ac.lk')
 );
+
+-- Ensure avatar_url column exists for existing deployments
+alter table public.profiles add column if not exists avatar_url text default '';
 
 -- 3. Student Course Enrollments
 create table if not exists public.student_courses (
@@ -137,7 +141,7 @@ for each row execute function public.enforce_kdu_email_domain();
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer as $$
 begin
-  insert into public.profiles (id, email, display_name, role)
+  insert into public.profiles (id, email, display_name, avatar_url, role)
   values (
     new.id,
     new.email,
@@ -145,6 +149,11 @@ begin
       new.raw_user_meta_data->>'full_name',
       new.raw_user_meta_data->>'name',
       split_part(new.email, '@', 1)
+    ),
+    coalesce(
+      new.raw_user_meta_data->>'avatar_url',
+      new.raw_user_meta_data->>'picture',
+      ''
     ),
     case
       when new.email ilike 'admin%' or new.email ilike 'staff%' or lower(new.email) = '43-ict-0042@kdu.ac.lk' then 'admin'
@@ -154,6 +163,10 @@ begin
   on conflict (id) do update
   set
     email = excluded.email,
+    avatar_url = case
+      when public.profiles.avatar_url is null or public.profiles.avatar_url = '' then excluded.avatar_url
+      else public.profiles.avatar_url
+    end,
     role = case
       when excluded.email ilike 'admin%' or excluded.email ilike 'staff%' or lower(excluded.email) = '43-ict-0042@kdu.ac.lk' then 'admin'
       else public.profiles.role

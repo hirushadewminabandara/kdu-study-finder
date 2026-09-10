@@ -30,14 +30,65 @@ function initials(name) {
 
 const AVATAR_PALETTE = ["#d8e3fb", "#fed56f", "#89f5e7", "#ffd8e4", "#e2e3e9", "#c3c6cf"];
 
-function avatarHtml(name, size) {
+function avatarHtml(name, size, avatarUrl) {
   const s = size || 38;
+  const init = esc(initials(name));
   let hash = 0;
   for (let i = 0; i < (name || "").length; i++) hash += name.charCodeAt(i);
   const bg = AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
+  const fontSize = Math.round(s * 0.38);
+
+  if (avatarUrl && typeof avatarUrl === "string" && avatarUrl.trim().length > 0) {
+    const cleanUrl = esc(avatarUrl.trim());
+    return '<div class="relative shrink-0 select-none overflow-hidden rounded-full shadow-sm border border-outline-variant/60" style="width:' + s + 'px;height:' + s + 'px;">' +
+      '<img src="' + cleanUrl + '" alt="' + esc(name || "Avatar") + '" class="w-full h-full object-cover rounded-full" ' +
+      'onerror="this.style.display=\'none\'; if(this.nextElementSibling) this.nextElementSibling.classList.remove(\'hidden\');" />' +
+      '<div class="w-full h-full rounded-full hidden items-center justify-center font-bold text-primary shrink-0" ' +
+      'style="background-color:' + bg + ';font-size:' + fontSize + 'px;">' + init + '</div>' +
+      '</div>';
+  }
+
   return '<div class="rounded-full flex items-center justify-center font-bold text-primary shrink-0 select-none shadow-sm" ' +
-    'style="width:' + s + 'px;height:' + s + 'px;background-color:' + bg + ';font-size:' + Math.round(s * 0.38) + 'px;">' +
-    esc(initials(name)) + '</div>';
+    'style="width:' + s + 'px;height:' + s + 'px;background-color:' + bg + ';font-size:' + fontSize + 'px;">' +
+    init + '</div>';
+}
+
+function resizeImageToDataUrl(file, maxDim, callback) {
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const img = new Image();
+    img.onload = function () {
+      let width = img.width;
+      let height = img.height;
+      const targetMax = maxDim || 256;
+      if (width > height) {
+        if (width > targetMax) {
+          height = Math.round((height * targetMax) / width);
+          width = targetMax;
+        }
+      } else {
+        if (height > targetMax) {
+          width = Math.round((width * targetMax) / height);
+          height = targetMax;
+        }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+      callback(null, dataUrl);
+    };
+    img.onerror = function () {
+      callback("Could not process image file format.");
+    };
+    img.src = e.target.result;
+  };
+  reader.onerror = function () {
+    callback("Failed to read image file.");
+  };
+  reader.readAsDataURL(file);
 }
 
 function slotLabel(key) {
@@ -177,7 +228,7 @@ function renderHeader(activePageKey) {
       '<div class="flex items-center gap-4">' +
         (user
           ? '<div class="flex items-center gap-3">' +
-              avatarHtml(user.name, 36) +
+              avatarHtml(user.name, 36, user.avatarUrl) +
               '<div class="hidden sm:flex flex-col text-left">' +
                 '<div class="flex items-center gap-2">' +
                   '<span class="font-label-md font-semibold text-on-surface leading-tight">' + esc(user.name) + '</span>' +
@@ -367,7 +418,124 @@ function initProfilePage() {
   const saveBtn = $("#btn-save-profile");
   const statusBadgeSpan = $("#studentTypePreview");
 
-  if (nameInput) nameInput.value = user.name || "";
+  let activeAvatarUrl = user.avatarUrl || "";
+
+  const avatarPreview = $("#profile-avatar-preview");
+  const avatarUrlInput = $("#avatarUrlInput");
+  const uploadBtn = $("#btn-upload-photo");
+  const fileInput = $("#avatarFileInput");
+  const removeBtn = $("#btn-remove-photo");
+  const presetsContainer = $("#avatar-presets-grid");
+
+  const PRESET_AVATARS = [
+    { label: "Cadet (M)", url: "img/avatars/cadet-male.svg" },
+    { label: "Cadet (F)", url: "img/avatars/cadet-female.svg" },
+    { label: "Scholar (M1)", url: "img/avatars/student-male-1.svg" },
+    { label: "Scholar (F1)", url: "img/avatars/student-female-1.svg" },
+    { label: "Scholar (M2)", url: "img/avatars/student-male-2.svg" },
+    { label: "Scholar (F2)", url: "img/avatars/student-female-2.svg" },
+    { label: "Staff Officer", url: "img/avatars/officer-staff.svg" }
+  ];
+
+  function refreshAvatarPreview() {
+    if (!avatarPreview) return;
+    const currentName = nameInput ? (nameInput.value.trim() || user.name) : user.name;
+    avatarPreview.innerHTML = avatarHtml(currentName, 72, activeAvatarUrl);
+    if (avatarUrlInput && document.activeElement !== avatarUrlInput) {
+      avatarUrlInput.value = activeAvatarUrl.startsWith("data:") ? "(Custom Uploaded Photo)" : activeAvatarUrl;
+    }
+  }
+
+  // Render Preset Buttons
+  if (presetsContainer) {
+    presetsContainer.innerHTML = PRESET_AVATARS.map(function (p) {
+      const isSelected = activeAvatarUrl === p.url;
+      return '<button type="button" class="preset-btn inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all ' +
+        (isSelected ? 'border-primary bg-surface-container text-primary font-bold ring-1 ring-primary' : 'border-outline-variant bg-surface-container-lowest text-on-surface hover:border-outline') + '" data-url="' + p.url + '">' +
+        avatarHtml(p.label, 20, p.url) +
+        '<span>' + esc(p.label) + '</span>' +
+        '</button>';
+    }).join("");
+
+    presetsContainer.addEventListener("click", function (e) {
+      const btn = e.target.closest(".preset-btn");
+      if (!btn) return;
+      activeAvatarUrl = btn.getAttribute("data-url");
+      $$(".preset-btn", presetsContainer).forEach(function (el) {
+        const sel = el.getAttribute("data-url") === activeAvatarUrl;
+        el.className = "preset-btn inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all " +
+          (sel ? "border-primary bg-surface-container text-primary font-bold ring-1 ring-primary" : "border-outline-variant bg-surface-container-lowest text-on-surface hover:border-outline");
+      });
+      refreshAvatarPreview();
+    });
+  }
+
+  // Upload Photo Handler
+  if (uploadBtn && fileInput) {
+    uploadBtn.addEventListener("click", function () { fileInput.click(); });
+    fileInput.addEventListener("change", function () {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("Image file exceeds 5MB limit. Please choose a smaller image.", true);
+        return;
+      }
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span><span>Optimizing...</span>';
+      resizeImageToDataUrl(file, 256, function (err, dataUrl) {
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">upload</span><span>Upload Photo</span>';
+        if (err) {
+          showToast(err, true);
+          return;
+        }
+        activeAvatarUrl = dataUrl;
+        if (presetsContainer) {
+          $$(".preset-btn", presetsContainer).forEach(function (el) {
+            el.className = "preset-btn inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all border-outline-variant bg-surface-container-lowest text-on-surface hover:border-outline";
+          });
+        }
+        refreshAvatarPreview();
+        showToast("Profile picture uploaded successfully!");
+      });
+    });
+  }
+
+  // Remove / Reset Avatar Handler
+  if (removeBtn) {
+    removeBtn.addEventListener("click", function () {
+      activeAvatarUrl = "";
+      if (fileInput) fileInput.value = "";
+      if (avatarUrlInput) avatarUrlInput.value = "";
+      if (presetsContainer) {
+        $$(".preset-btn", presetsContainer).forEach(function (el) {
+          el.className = "preset-btn inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all border-outline-variant bg-surface-container-lowest text-on-surface hover:border-outline";
+        });
+      }
+      refreshAvatarPreview();
+      showToast("Reset to university initials badge.");
+    });
+  }
+
+  // URL input handler
+  if (avatarUrlInput) {
+    avatarUrlInput.addEventListener("input", function () {
+      const val = avatarUrlInput.value.trim();
+      if (!val.startsWith("(Custom Uploaded")) {
+        activeAvatarUrl = val;
+        refreshAvatarPreview();
+      }
+    });
+  }
+
+  refreshAvatarPreview();
+
+  if (nameInput) {
+    nameInput.value = user.name || "";
+    nameInput.addEventListener("input", function () {
+      if (!activeAvatarUrl) refreshAvatarPreview();
+    });
+  }
   if (indexInput) indexInput.value = user.indexNo || "";
   if (emailInput) emailInput.value = user.email || "";
   if (bioInput) bioInput.value = user.bio || "";
@@ -550,6 +718,7 @@ function initProfilePage() {
       const err = await updateUserProfile(user.id, {
         name: nameVal,
         indexNo: indexVal,
+        avatarUrl: activeAvatarUrl,
         facultyId: Number(facultySelect?.value) || 1,
         departmentId: Number(deptSelect?.value) || 1,
         intake: intakeSelect?.value || "43",
@@ -583,6 +752,10 @@ function initDashboardPage() {
   const dept = deptById(user.departmentId);
 
   // Top Greeting Area
+  const avatarEl = $("#dash-user-avatar");
+  if (avatarEl) {
+    avatarEl.innerHTML = avatarHtml(user.name, 56, user.avatarUrl);
+  }
   const greetingEl = $("#dash-greeting-name");
   if (greetingEl) {
     greetingEl.textContent = "Ayubowan, " + user.name;
@@ -676,7 +849,7 @@ function initDashboardPage() {
         '<div>' +
           '<div class="flex items-start justify-between gap-3 pb-3 border-b border-outline-variant/60">' +
             '<div class="flex items-center gap-3">' +
-              avatarHtml(other.name, 44) +
+              avatarHtml(other.name, 44, other.avatarUrl) +
               '<div class="flex flex-col">' +
                 '<div class="flex items-center gap-2 flex-wrap">' +
                   '<h3 class="font-headline-sm text-primary font-bold leading-tight">' + esc(other.name) + '</h3>' +
@@ -741,7 +914,7 @@ function initDashboardPage() {
             const targetGroup = r.groupId ? groupById(r.groupId) : null;
             return '<div class="p-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant flex items-center justify-between gap-3">' +
               '<div class="flex items-center gap-3">' +
-                avatarHtml(sender ? sender.name : "Peer", 36) +
+                avatarHtml(sender ? sender.name : "Peer", 36, sender ? sender.avatarUrl : null) +
                 '<div class="flex flex-col">' +
                   '<span class="text-sm font-bold text-primary">' + esc(sender ? sender.name : "Student") + '</span>' +
                   '<span class="text-xs text-on-surface-variant">' +
@@ -987,7 +1160,7 @@ function initGroupsPage() {
 
           '<div class="p-3 rounded-xl bg-surface-container-low/70 mb-4 flex items-center justify-between text-xs">' +
             '<div class="flex items-center gap-2">' +
-              avatarHtml(leader ? leader.name : "Cadet", 24) +
+              avatarHtml(leader ? leader.name : "Cadet", 24, leader ? leader.avatarUrl : null) +
               '<span class="text-on-surface font-medium">' + esc(leader ? leader.name : "Group Leader") + '</span>' +
             '</div>' +
             '<span class="font-semibold text-primary">' + g.members.length + ' / ' + g.max_members + ' seats</span>' +
@@ -1132,7 +1305,7 @@ function initGroupDetailPage() {
 
       return '<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest border border-outline-variant">' +
         '<div class="flex items-center gap-3">' +
-          avatarHtml(mUser.name, 36) +
+          avatarHtml(mUser.name, 36, mUser.avatarUrl) +
           '<div class="flex flex-col">' +
             '<div class="flex items-center gap-1.5">' +
               '<span class="text-sm font-bold text-primary">' + esc(mUser.name) + '</span>' +
@@ -1161,20 +1334,25 @@ function initGroupDetailPage() {
       const isMine = m.sender === user.id;
       const sender = userById(m.sender);
       const sType = getStudentType(sender?.indexNo);
+      const sName = isMine ? "You" : (sender ? sender.name : "Cadet");
+      const sAvatar = isMine ? user.avatarUrl : (sender ? sender.avatarUrl : null);
 
-      return '<div class="flex flex-col ' + (isMine ? 'items-end' : 'items-start') + ' mb-3">' +
-        '<div class="flex items-center gap-2 mb-1 px-1">' +
-          '<span class="text-xs font-bold ' + (isMine ? 'text-primary' : 'text-on-surface') + '">' +
-            (isMine ? 'You' : esc(sender ? sender.name : "Cadet")) +
-          '</span>' +
-          '<span class="text-[10px] px-1.5 py-0.2 rounded ' + sType.badgeClass + '">' + sType.type + '</span>' +
-          '<span class="text-[10px] text-on-surface-variant">' + formatTime(m.at) + '</span>' +
-        '</div>' +
-        '<div class="px-4 py-2.5 rounded-2xl max-w-lg text-sm ' +
-          (isMine
-            ? 'bg-primary text-on-primary rounded-tr-none shadow-sm'
-            : 'bg-surface-container text-on-surface rounded-tl-none border border-outline-variant') + '">' +
-          esc(m.text) +
+      return '<div class="flex items-start gap-2.5 mb-3.5 ' + (isMine ? 'flex-row-reverse' : 'flex-row') + '">' +
+        avatarHtml(isMine ? user.name : (sender ? sender.name : "Cadet"), 32, sAvatar) +
+        '<div class="flex flex-col ' + (isMine ? 'items-end' : 'items-start') + ' max-w-[80%]">' +
+          '<div class="flex items-center gap-2 mb-1 px-1">' +
+            '<span class="text-xs font-bold ' + (isMine ? 'text-primary' : 'text-on-surface') + '">' +
+              esc(sName) +
+            '</span>' +
+            '<span class="text-[10px] px-1.5 py-0.2 rounded ' + sType.badgeClass + '">' + sType.type + '</span>' +
+            '<span class="text-[10px] text-on-surface-variant">' + formatTime(m.at) + '</span>' +
+          '</div>' +
+          '<div class="px-4 py-2.5 rounded-2xl text-sm ' +
+            (isMine
+              ? 'bg-primary text-on-primary rounded-tr-none shadow-sm'
+              : 'bg-surface-container text-on-surface rounded-tl-none border border-outline-variant') + '">' +
+            esc(m.text) +
+          '</div>' +
         '</div>' +
       '</div>';
     }).join("");
@@ -1264,7 +1442,7 @@ function initGroupDetailPage() {
             const sender = userById(r.from);
             return '<div class="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant flex items-center justify-between gap-3">' +
               '<div class="flex items-center gap-2">' +
-                avatarHtml(sender ? sender.name : "Cadet", 32) +
+                avatarHtml(sender ? sender.name : "Cadet", 32, sender ? sender.avatarUrl : null) +
                 '<div class="flex flex-col">' +
                   '<span class="text-xs font-bold text-primary">' + esc(sender ? sender.name : "Applicant") + '</span>' +
                   '<span class="text-[11px] text-on-surface-variant font-mono">' + esc(sender ? sender.indexNo : "") + '</span>' +
@@ -1370,7 +1548,7 @@ function initAdminPage() {
         const isComplete = profileComplete(u);
 
         return '<tr class="border-b border-outline-variant/50 hover:bg-surface-container-low/50">' +
-          '<td class="py-3 px-4 text-xs font-bold text-on-surface">' + esc(u.name) + '</td>' +
+          '<td class="py-3 px-4 text-xs font-bold text-on-surface flex items-center gap-2.5">' + avatarHtml(u.name, 28, u.avatarUrl) + '<span>' + esc(u.name) + '</span></td>' +
           '<td class="py-3 px-4 text-xs font-mono font-semibold">' + esc(u.indexNo || "—") + '</td>' +
           '<td class="py-3 px-4 text-xs"><span class="px-2 py-0.5 rounded text-[10px] ' + type.badgeClass + '">' + type.type + '</span></td>' +
           '<td class="py-3 px-4 text-xs text-on-surface-variant">' + esc(fac ? fac.code : "FOT") + ' · ' + esc(dept ? dept.code : "BST") + '</td>' +

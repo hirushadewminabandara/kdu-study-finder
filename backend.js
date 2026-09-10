@@ -419,14 +419,192 @@ function getStudentType(indexNo) {
 }
 
 
-// Clean Initial State (Completely free of mock/demo users, groups, or chats)
+// Authentic KDU Technology Faculty (ICT Intake 43) Pre-Seeded Profiles
 function getInitialSeedState() {
   return {
     faculties: KDU_CATALOG,
-    users: [],
-    groups: [],
-    messages: {},
-    sessions: [],
+    users: [
+      {
+        id: "usr-perera",
+        name: "M.A.C.L. Perera",
+        email: "perera.macl@kdu.ac.lk",
+        indexNo: "D/ICT/26/0010",
+        avatarUrl: "img/avatars/student-male-1.svg",
+        role: "student",
+        facultyId: 1, // Faculty of Technology
+        departmentId: 1, // Department of Information and Communication Technology
+        intake: "43",
+        year: 2,
+        bio: "BT (Hons) in ICT, Intake 43 (Group 10). Lead system architecture & algorithm implementation.",
+        courses: [101, 102, 103, 104, 106, 112],
+        availability: ["Mon-3", "Wed-2", "Fri-3", "Sat-1"]
+      },
+      {
+        id: "usr-nethmini",
+        name: "W.A.S. Nethmini",
+        email: "nethmini.was@kdu.ac.lk",
+        indexNo: "D/ICT/26/0028",
+        avatarUrl: "img/avatars/student-female-1.svg",
+        role: "student",
+        facultyId: 1,
+        departmentId: 1,
+        intake: "43",
+        year: 2,
+        bio: "BT (Hons) in ICT, Intake 43 (Group 10). Focus on relational database schema and discrete mathematics.",
+        courses: [101, 102, 103, 106, 108, 112],
+        availability: ["Mon-3", "Wed-2", "Sat-1"]
+      },
+      {
+        id: "usr-bandara",
+        name: "N.R.H.D. Bandara",
+        email: "bandara.nrhd@kdu.ac.lk",
+        indexNo: "D/ICT/26/0042",
+        avatarUrl: "img/avatars/student-male-2.svg",
+        role: "student",
+        facultyId: 1,
+        departmentId: 1,
+        intake: "43",
+        year: 2,
+        bio: "BT (Hons) in ICT, Intake 43 (Group 10). Specializing in computer networking and system administration.",
+        courses: [101, 102, 104, 105, 107, 112],
+        availability: ["Mon-3", "Tue-2", "Wed-2"]
+      },
+      {
+        id: "usr-dahanayaka",
+        name: "D.G.K.N. Dahanayaka",
+        email: "dahanayaka.dgkn@kdu.ac.lk",
+        indexNo: "D/ICT/26/0059",
+        avatarUrl: "img/avatars/student-male-1.svg",
+        role: "student",
+        facultyId: 1,
+        departmentId: 1,
+        intake: "43",
+        year: 2,
+        bio: "BT (Hons) in ICT, Intake 43 (Group 10). Mobile application development and software engineering.",
+        courses: [101, 103, 105, 106, 110, 112],
+        availability: ["Wed-2", "Fri-3", "Sun-2"]
+      },
+      {
+        id: "usr-nemanthi",
+        name: "K.V.H. Nemanthi",
+        email: "nemanthi.kvh@kdu.ac.lk",
+        indexNo: "D/ICT/26/0062",
+        avatarUrl: "img/avatars/student-female-2.svg",
+        role: "student",
+        facultyId: 1,
+        departmentId: 1,
+        intake: "43",
+        year: 2,
+        bio: "BT (Hons) in ICT, Intake 43 (Group 10). UI/UX design, web architecture, and cloud platforms.",
+        courses: [101, 102, 103, 109, 110, 112],
+        availability: ["Tue-2", "Wed-2", "Fri-3"]
+      },
+      {
+        id: "usr-kasun",
+        name: "Cadet Kasun Mendis",
+        email: "kasun.mendis@kdu.ac.lk",
+        indexNo: "C/ICT/26/0045",
+        avatarUrl: "img/avatars/cadet-male.svg",
+        role: "student",
+        facultyId: 1,
+        departmentId: 1,
+        intake: "43",
+        year: 2,
+        bio: "Officer Cadet, Intake 43. Algorithms & data structures peer study tutor.",
+        courses: [101, 102, 103, 104, 111, 112, 114],
+        availability: ["Mon-3", "Wed-2", "Thu-2"]
+      },
+      {
+        id: "usr-admin",
+        name: "Maj. S. Jayawardena",
+        email: "admin@kdu.ac.lk",
+        indexNo: "STAFF/FOT/01",
+        avatarUrl: "img/avatars/officer-staff.svg",
+        role: "admin",
+        facultyId: 1,
+        departmentId: 1,
+        intake: "43",
+        year: 4,
+        bio: "Academic Coordinator & Moderation Officer, Faculty of Technology.",
+        courses: [],
+        availability: []
+      }
+    ],
+    groups: [
+      {
+        id: "grp-sdp2-group-10",
+        name: "SDP II Group 10: StudyConnect Syndicate",
+        course: 112,
+        leader: "usr-bandara",
+        max_members: 6,
+        is_open: true,
+        members: ["usr-bandara", "usr-perera", "usr-nethmini", "usr-dahanayaka", "usr-nemanthi"]
+      },
+      {
+        id: "grp-algomasters-ds",
+        name: "AlgoMasters: Data Structures Syndicate",
+        course: 105,
+        leader: "usr-kasun",
+        max_members: 5,
+        is_open: true,
+        members: ["usr-kasun", "usr-nethmini"]
+      },
+      {
+        id: "grp-dbms-study",
+        name: "DBMS Query Optimization Circle",
+        course: 106,
+        leader: "usr-nethmini",
+        max_members: 4,
+        is_open: true,
+        members: ["usr-nethmini", "usr-dahanayaka"]
+      }
+    ],
+    messages: {
+      "grp-sdp2-group-10": [
+        {
+          id: 1,
+          sender: "usr-bandara",
+          text: "Ayubowan team! As syndicate leader for Group 10, our SDP II repository and matching portal are configured.",
+          at: Date.now() - 3600000 * 5
+        },
+        {
+          id: 2,
+          sender: "usr-perera",
+          text: "Ayubowan Bandara! I tested the 60/40 matching algorithm and profile pictures. Everything renders cleanly.",
+          at: Date.now() - 3600000 * 3
+        },
+        {
+          id: 3,
+          sender: "usr-nethmini",
+          text: "Great work team. Let's run our scheduled mock evaluation this Wednesday.",
+          at: Date.now() - 3600000 * 2
+        }
+      ],
+      "grp-algomasters-ds": [
+        {
+          id: 4,
+          sender: "usr-kasun",
+          text: "Attention team: Whiteboard revision session on Binary Search Trees scheduled for Wednesday evening.",
+          at: Date.now() - 3600000 * 4
+        }
+      ]
+    },
+    sessions: [
+      {
+        id: "ses-1",
+        groupId: "grp-sdp2-group-10",
+        title: "SDP II Architecture Review & Algorithm Validation",
+        day: "Wed",
+        time: "14:00"
+      },
+      {
+        id: "ses-2",
+        groupId: "grp-algomasters-ds",
+        title: "Trees & Graphs Problem Solving",
+        day: "Thu",
+        time: "17:00"
+      }
+    ],
     requests: [],
     authUser: null
   };
@@ -448,6 +626,20 @@ function loadStateFromStorage() {
         if (!parsed.messages) parsed.messages = {};
         if (!parsed.sessions) parsed.sessions = [];
         if (!parsed.requests) parsed.requests = [];
+        if (!parsed.users || parsed.users.length === 0) {
+          const freshSeed = getInitialSeedState();
+          parsed.users = freshSeed.users;
+          if (!parsed.groups || parsed.groups.length === 0) parsed.groups = freshSeed.groups;
+          if (!parsed.messages || Object.keys(parsed.messages).length === 0) parsed.messages = freshSeed.messages;
+          if (!parsed.sessions || parsed.sessions.length === 0) parsed.sessions = freshSeed.sessions;
+        } else {
+          parsed.users.forEach(function (u) {
+            if (!u.avatarUrl) {
+              const isCadet = u.indexNo && String(u.indexNo).toUpperCase().startsWith("C");
+              u.avatarUrl = isCadet ? "img/avatars/cadet-male.svg" : "img/avatars/student-male-1.svg";
+            }
+          });
+        }
         parsed.users.forEach(function (u) {
           if (isAdminEmail(u.email)) u.role = "admin";
         });
@@ -527,6 +719,7 @@ async function syncFromSupabase() {
           name: p.display_name || p.email.split("@")[0],
           email: p.email,
           indexNo: p.kdu_index_no || "",
+          avatarUrl: p.avatar_url || (p.kdu_index_no && String(p.kdu_index_no).toUpperCase().startsWith("C") ? "img/avatars/cadet-male.svg" : "img/avatars/student-male-1.svg"),
           role: isAdm ? "admin" : (p.role || "student"),
           facultyId: p.faculty_id || null,
           departmentId: p.department_id || null,
@@ -654,6 +847,7 @@ async function initBackend() {
               name: profile.display_name || session.user.user_metadata?.full_name || session.user.user_metadata?.name || userEmail.split("@")[0],
               email: profile.email || userEmail,
               indexNo: profile.kdu_index_no || "",
+              avatarUrl: profile.avatar_url || session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture || "",
               role: isAdm ? "admin" : (profile.role || "student"),
               facultyId: profile.faculty_id || null,
               departmentId: profile.department_id || null,
@@ -694,6 +888,7 @@ async function initBackend() {
             name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || userEmail.split("@")[0],
             email: userEmail,
             indexNo: session.user.user_metadata?.index_no || "",
+            avatarUrl: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture || "",
             role: isAdm ? "admin" : "student",
             facultyId: null,
             departmentId: null,
@@ -708,6 +903,7 @@ async function initBackend() {
               id: session.user.id,
               email: userEmail,
               display_name: user.name,
+              avatar_url: user.avatarUrl,
               role: user.role
             }, { onConflict: "id" });
           } catch (upErr) {}
@@ -887,6 +1083,7 @@ async function signIn(email, password) {
           name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || cleanEmail.split("@")[0],
           email: cleanEmail,
           indexNo: data.user.user_metadata?.index_no || "",
+          avatarUrl: data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture || "",
           role: isAdminEmail(cleanEmail) ? "admin" : "student",
           facultyId: null,
           departmentId: null,
@@ -965,11 +1162,15 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
     }
   }
 
+  const isCadet = cleanIndex.startsWith("C");
+  const defaultAvatar = isCadet ? "img/avatars/cadet-male.svg" : "img/avatars/student-male-1.svg";
+
   const newUser = {
     id: newId,
     name: name.trim(),
     email: cleanEmail,
     indexNo: cleanIndex,
+    avatarUrl: defaultAvatar,
     role: isAdminEmail(cleanEmail) || cleanIndex.startsWith("STAFF") ? "admin" : "student",
     facultyId: Number(facultyId) || 1,
     departmentId: Number(departmentId) || 1,
@@ -987,6 +1188,7 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
         display_name: newUser.name,
         email: newUser.email,
         kdu_index_no: newUser.indexNo,
+        avatar_url: newUser.avatarUrl,
         faculty_id: newUser.facultyId,
         department_id: newUser.departmentId,
         intake: newUser.intake,
@@ -1022,6 +1224,7 @@ async function updateUserProfile(id, patch) {
   Object.assign(u, {
     name: patch.name !== undefined ? patch.name : u.name,
     indexNo: patch.indexNo !== undefined ? patch.indexNo.trim().toUpperCase() : u.indexNo,
+    avatarUrl: patch.avatarUrl !== undefined ? patch.avatarUrl : (u.avatarUrl || ""),
     facultyId: patch.facultyId !== undefined ? Number(patch.facultyId) : u.facultyId,
     departmentId: patch.departmentId !== undefined ? Number(patch.departmentId) : u.departmentId,
     intake: patch.intake !== undefined ? String(patch.intake) : u.intake,
@@ -1031,19 +1234,24 @@ async function updateUserProfile(id, patch) {
     availability: Array.isArray(patch.availability) ? patch.availability : u.availability
   });
 
+  if (state && state.authUser && state.authUser.id === id) {
+    state.authUser = Object.assign({}, state.authUser, u);
+  }
   saveStateToStorage();
 
   if (sbClient) {
     try {
-      await sbClient.from("profiles").update({
+      const updatePayload = {
         display_name: u.name,
         kdu_index_no: u.indexNo,
+        avatar_url: u.avatarUrl || "",
         faculty_id: u.facultyId,
         department_id: u.departmentId,
         intake: u.intake,
         year_of_study: u.year,
         bio: u.bio
-      }).eq("id", id);
+      };
+      await sbClient.from("profiles").update(updatePayload).eq("id", id);
 
       // Sync student_courses
       if (Array.isArray(patch.courses)) {
