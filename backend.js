@@ -418,6 +418,37 @@ function getStudentType(indexNo) {
   return { type: "Day Scholar", label: "Day Scholar", isCadet: false, badgeClass: "bg-surface-container-high text-primary-container font-semibold" };
 }
 
+const AVATAR_CACHE_KEY = "kdu_avatar_persistent_cache_v1";
+
+function getCachedAvatar(key) {
+  if (!key) return "";
+  try {
+    const raw = localStorage.getItem(AVATAR_CACHE_KEY);
+    if (!raw) return "";
+    const map = JSON.parse(raw);
+    const cleanKey = String(key).trim().toLowerCase();
+    return (map && map[cleanKey]) || "";
+  } catch (e) {
+    return "";
+  }
+}
+
+function setCachedAvatar(keyOrEmail, avatarUrl) {
+  if (!keyOrEmail) return;
+  try {
+    const raw = localStorage.getItem(AVATAR_CACHE_KEY);
+    const map = raw ? JSON.parse(raw) : {};
+    const cleanKey = String(keyOrEmail).trim().toLowerCase();
+    if (!avatarUrl) {
+      delete map[cleanKey];
+    } else {
+      map[cleanKey] = avatarUrl;
+    }
+    localStorage.setItem(AVATAR_CACHE_KEY, JSON.stringify(map));
+  } catch (e) {
+    console.warn("Avatar cache write notice:", e);
+  }
+}
 
 // Authentic KDU Technology Faculty (ICT Intake 43) Pre-Seeded Profiles
 function getInitialSeedState() {
@@ -634,7 +665,10 @@ function loadStateFromStorage() {
           if (!parsed.sessions || parsed.sessions.length === 0) parsed.sessions = freshSeed.sessions;
         } else {
           parsed.users.forEach(function (u) {
-            if (!u.avatarUrl) {
+            const cached = getCachedAvatar(u.id) || getCachedAvatar(u.email);
+            if (cached) {
+              u.avatarUrl = cached;
+            } else if (!u.avatarUrl) {
               const isCadet = u.indexNo && String(u.indexNo).toUpperCase().startsWith("C");
               u.avatarUrl = isCadet ? "img/avatars/cadet-male.svg" : "img/avatars/student-male-1.svg";
             }
@@ -643,8 +677,10 @@ function loadStateFromStorage() {
         parsed.users.forEach(function (u) {
           if (isAdminEmail(u.email)) u.role = "admin";
         });
-        if (parsed.authUser && isAdminEmail(parsed.authUser.email)) {
-          parsed.authUser.role = "admin";
+        if (parsed.authUser) {
+          const authCached = getCachedAvatar(parsed.authUser.id) || getCachedAvatar(parsed.authUser.email);
+          if (authCached) parsed.authUser.avatarUrl = authCached;
+          if (isAdminEmail(parsed.authUser.email)) parsed.authUser.role = "admin";
         }
         return parsed;
       }
@@ -714,12 +750,20 @@ async function syncFromSupabase() {
           });
 
         const isAdm = isAdminEmail(p.email) || p.role === "admin";
+        const existingLocal = (state.users || []).find(function (u) { return u.id === p.id || String(u.email).toLowerCase() === String(p.email).toLowerCase(); });
+        const cachedAv = getCachedAvatar(p.id) || getCachedAvatar(p.email);
+        const isCadet = p.kdu_index_no && String(p.kdu_index_no).toUpperCase().startsWith("C");
+        const defaultAv = isCadet ? "img/avatars/cadet-male.svg" : "img/avatars/student-male-1.svg";
+        const finalAvatar = (p.avatar_url && String(p.avatar_url).trim().length > 0)
+          ? p.avatar_url
+          : (cachedAv || (existingLocal && existingLocal.avatarUrl) || defaultAv);
+
         return {
           id: p.id,
           name: p.display_name || p.email.split("@")[0],
           email: p.email,
           indexNo: p.kdu_index_no || "",
-          avatarUrl: p.avatar_url || (p.kdu_index_no && String(p.kdu_index_no).toUpperCase().startsWith("C") ? "img/avatars/cadet-male.svg" : "img/avatars/student-male-1.svg"),
+          avatarUrl: finalAvatar,
           role: isAdm ? "admin" : (p.role || "student"),
           facultyId: p.faculty_id || null,
           departmentId: p.department_id || null,

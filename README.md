@@ -380,9 +380,9 @@ flowchart TD
         RT[Supabase Realtime WebSocket Channels]
     end
 
-    DAL -.->|When isSupabaseConfigured() = true| Auth
-    DAL -.->|PostgreSQL REST API| DB
-    DAL -.->|Group Chat WebSockets| RT
+    DAL -.->|"When isSupabaseConfigured() = true"| Auth
+    DAL -.->|"PostgreSQL REST API"| DB
+    DAL -.->|"Group Chat WebSockets"| RT
 ```
 
 ---
