@@ -677,11 +677,7 @@ function loadStateFromStorage() {
         parsed.users.forEach(function (u) {
           if (isAdminEmail(u.email)) u.role = "admin";
         });
-        if (parsed.authUser) {
-          const authCached = getCachedAvatar(parsed.authUser.id) || getCachedAvatar(parsed.authUser.email);
-          if (authCached) parsed.authUser.avatarUrl = authCached;
-          if (isAdminEmail(parsed.authUser.email)) parsed.authUser.role = "admin";
-        }
+        parsed.authUser = null;
         return parsed;
       }
     }
@@ -695,7 +691,9 @@ function loadStateFromStorage() {
 
 function saveStateToStorage(s) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(s || state));
+    const data = Object.assign({}, s || state);
+    data.authUser = null; // Active user session is managed via session storage / auth provider
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
     console.warn("Storage save warning:", e);
   }
@@ -981,6 +979,8 @@ async function initBackend() {
   const storedAuthId = sessionStorage.getItem("kdu_active_user_id");
   if (storedAuthId) {
     state.authUser = userById(storedAuthId) || null;
+  } else {
+    state.authUser = null;
   }
   return !!state.authUser;
 }
@@ -1042,6 +1042,12 @@ function groupById(id) {
 
 function currentUser() {
   if (!state) state = loadStateFromStorage();
+  if (state && !state.authUser) {
+    const storedAuthId = sessionStorage.getItem("kdu_active_user_id");
+    if (storedAuthId) {
+      state.authUser = userById(storedAuthId) || null;
+    }
+  }
   if (state && state.authUser && isAdminEmail(state.authUser.email)) {
     state.authUser.role = "admin";
   }
@@ -1253,10 +1259,18 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
 
 async function signOut() {
   if (sbClient) {
-    try { await sbClient.auth.signOut(); } catch (e) {}
+    try {
+      await sbClient.auth.signOut();
+    } catch (e) {
+      console.warn("Supabase signOut notice:", e);
+    }
   }
   sessionStorage.removeItem("kdu_active_user_id");
-  if (state) state.authUser = null;
+  localStorage.removeItem("kdu_active_user_id");
+  if (state) {
+    state.authUser = null;
+  }
+  saveStateToStorage();
 }
 
 // ---------- Mutations ----------

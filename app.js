@@ -247,9 +247,12 @@ function renderHeader(activePageKey) {
 
   const signoutBtn = $("#btn-signout");
   if (signoutBtn) {
-    signoutBtn.addEventListener("click", async function () {
+    signoutBtn.addEventListener("click", async function (e) {
+      e.preventDefault();
+      signoutBtn.disabled = true;
+      signoutBtn.textContent = "Signing out...";
       await signOut();
-      location.href = "index.html";
+      window.location.replace("index.html");
     });
   }
 }
