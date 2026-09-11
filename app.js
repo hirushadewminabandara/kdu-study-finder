@@ -252,14 +252,38 @@ function renderHeader(activePageKey) {
       signoutBtn.disabled = true;
       signoutBtn.textContent = "Signing out...";
       await signOut();
-      window.location.replace("index.html");
+      window.location.replace("index.html?signout=1");
     });
   }
 }
 
+// Global delegated listener for sign out buttons across all pages
+document.addEventListener("click", async function (e) {
+  const btn = e.target.closest("#btn-signout, .btn-signout");
+  if (btn && !btn.dataset.handling) {
+    btn.dataset.handling = "true";
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = "Signing out...";
+    await signOut();
+    window.location.replace("index.html?signout=1");
+  }
+});
+
 // ---------- Page Controller: Authentication (index.html) ----------
 
 function initAuthPage() {
+  // If user just logged out, bypass auto-redirect and display confirmation
+  if (window.location.search.includes("signout") || window.location.search.includes("logout")) {
+    if (window.history.replaceState) {
+      window.history.replaceState(null, null, window.location.pathname);
+    }
+    if (typeof showToast === "function") {
+      showToast("Signed out successfully.");
+    }
+    return;
+  }
+
   // If user is already authenticated (e.g. from Google OAuth callback or active session)
   const activeUser = currentUser();
   if (activeUser) {

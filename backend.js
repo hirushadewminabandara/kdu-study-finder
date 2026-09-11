@@ -394,10 +394,12 @@ const KDU_CATALOG = [
 
 // Whitelisted Administrator Accounts
 const ADMIN_EMAILS = [
-  "43-ict-0042@kdu.ac.lk"
+  "43-ict-0042@kdu.ac.lk",
+  "bandara.nrhd@kdu.ac.lk"
 ];
 
-function isAdminEmail(email) {
+function isAdminEmail(email, indexNo) {
+  if (indexNo && String(indexNo).trim().toUpperCase() === "D/ICT/26/0042") return true;
   if (!email) return false;
   const clean = String(email).trim().toLowerCase();
   return clean.includes("admin") || clean.startsWith("staff") || ADMIN_EMAILS.includes(clean);
@@ -857,6 +859,26 @@ async function initBackend() {
   if (!sbClient) initSupabaseClient();
   state = loadStateFromStorage();
 
+  // If page loaded with signout/logout query parameter, enforce clean logged-out state
+  if (typeof window !== "undefined" && window.location && (window.location.search.includes("signout") || window.location.search.includes("logout"))) {
+    if (sbClient && sbClient.auth) {
+      try { await sbClient.auth.signOut({ scope: "local" }); } catch (e) {}
+    }
+    sessionStorage.clear();
+    localStorage.removeItem("kdu_active_user_id");
+    try {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith("sb-") || k.includes("supabase") || k.includes("auth-token"))) {
+          localStorage.removeItem(k);
+        }
+      }
+    } catch (e) {}
+    if (state) state.authUser = null;
+    saveStateToStorage();
+    return false;
+  }
+
   if (sbClient) {
     try {
       const { data: { session } } = await sbClient.auth.getSession();
@@ -1024,15 +1046,25 @@ function deptById(id) {
 }
 
 function userById(id) {
-  const u = db().users.find(function (x) { return x.id === id; }) || null;
-  if (u && isAdminEmail(u.email)) u.role = "admin";
+  if (!id) return null;
+  const cleanId = String(id).trim();
+  const u = db().users.find(function (x) {
+    return x.id === cleanId ||
+      (x.indexNo && x.indexNo.toUpperCase() === cleanId.toUpperCase()) ||
+      (x.email && x.email.toLowerCase() === cleanId.toLowerCase());
+  }) || null;
+  if (u && (isAdminEmail(u.email, u.indexNo) || u.role === "admin")) u.role = "admin";
   return u;
 }
 
 function userByEmail(email) {
   if (!email) return null;
-  const u = db().users.find(function (x) { return String(x.email).toLowerCase() === String(email).trim().toLowerCase(); }) || null;
-  if (u && isAdminEmail(u.email)) u.role = "admin";
+  const clean = String(email).trim().toLowerCase();
+  const u = db().users.find(function (x) {
+    return String(x.email).toLowerCase() === clean ||
+      (x.indexNo && x.indexNo.toLowerCase() === clean);
+  }) || null;
+  if (u && (isAdminEmail(u.email, u.indexNo) || u.role === "admin")) u.role = "admin";
   return u;
 }
 
@@ -1258,18 +1290,60 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
 }
 
 async function signOut() {
-  if (sbClient) {
-    try {
-      await sbClient.auth.signOut();
-    } catch (e) {
-      console.warn("Supabase signOut notice:", e);
-    }
-  }
-  sessionStorage.removeItem("kdu_active_user_id");
-  localStorage.removeItem("kdu_active_user_id");
+  // 1. Immediately purge in-memory state and active session IDs
   if (state) {
     state.authUser = null;
   }
+  try {
+    sessionStorage.clear();
+  } catch (e) {}
+  try {
+    localStorage.removeItem("kdu_active_user_id");
+    sessionStorage.removeItem("kdu_active_user_id");
+  } catch (e) {}
+
+  // 2. Clear all Supabase auth tokens and cached sessions from storage
+  try {
+    const purgeKeys = function (storage) {
+      const toRemove = [];
+      for (let i = 0; i < storage.length; i++) {
+        const k = storage.key(i);
+        if (k && (k.startsWith("sb-") || k.includes("supabase") || k.includes("auth-token") || k.includes("kdu_active_user_id"))) {
+          toRemove.push(k);
+        }
+      }
+      toRemove.forEach(function (k) { storage.removeItem(k); });
+    };
+    purgeKeys(localStorage);
+    purgeKeys(sessionStorage);
+  } catch (e) {}
+
+  // 3. Request Supabase client sign out with timeout guard (so it never hangs redirect)
+  if (sbClient && sbClient.auth) {
+    try {
+      await Promise.race([
+        sbClient.auth.signOut({ scope: "local" }),
+        new Promise(function (resolve) { setTimeout(resolve, 500); })
+      ]);
+    } catch (e) {}
+    try {
+      await Promise.race([
+        sbClient.auth.signOut(),
+        new Promise(function (resolve) { setTimeout(resolve, 800); })
+      ]);
+    } catch (e) {}
+  }
+
+  // 4. Secondary cleanup of any tokens left behind by Supabase
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && (k.startsWith("sb-") || k.includes("supabase") || k.includes("auth-token") || k.includes("kdu_active_user_id"))) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch (e) {}
+
   saveStateToStorage();
 }
 
