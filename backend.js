@@ -1477,10 +1477,14 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
 
   if (sbClient) {
     try {
+      const redirectUrl = window.location.origin + window.location.pathname;
       const { data, error } = await sbClient.auth.signUp({
         email: cleanEmail,
         password: password,
-        options: { data: { full_name: name.trim(), name: name.trim(), index_no: cleanIndex } }
+        options: {
+          data: { full_name: name.trim(), name: name.trim(), index_no: cleanIndex },
+          emailRedirectTo: redirectUrl
+        }
       });
       if (error) return error.message;
       if (data && data.user) {
