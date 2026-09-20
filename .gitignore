@@ -19,3 +19,7 @@ desktop.ini
 
 # Logs
 *.log
+
+# Internal reports & viva presentation notes
+*Report*.md
+*Presentation_Brief*.md
