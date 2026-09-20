@@ -2,7 +2,7 @@
 > **General Sir John Kotelawala Defence University (KDU), Sri Lanka**  
 > **Faculty of Technology (FOT) · Department of Biosystems Technology (DBST)**  
 > **Bachelor of Technology (Hons) in Information and Communication Technology (BTech Hons in ICT)**  
-> **Module:** Skill Development Project II (`ICT2282`)  
+> **Module:** Skill Development Project (Second iteration)  
 > **Cohort:** Intake 43 · Group 10  
 > **Official Artifact for Academic Presentation, Lecture Viva & Defense**
 
@@ -343,7 +343,7 @@ graph LR
     DBST --> P1["Programme: BTech (Hons) in ICT"]
     DBST --> P2["Programme: BBST (Hons) in Applied Biotechnology"]
 
-    DBST --> M1[ICT2282: Skill Development Project II]
+    DBST --> M1["ICT2282: Skill Development Project (Second iteration)"]
     DBST --> M2[ICT1223: Data Structures & Algorithms]
     DBST --> M3[ICT1233: Database Management Systems]
     DBST --> M4[ICT2123: Computer Networks & Data Comm]
@@ -788,7 +788,7 @@ ALTER TABLE public.study_sessions REPLICA IDENTITY FULL;
 ---
 
 ## 📜 Intellectual Property & University Citation
-* **Project:** KDU StudyConnect (Skill Development Project II)
+* **Project:** KDU StudyConnect (Skill Development Project - Second iteration)
 * **Authoring Syndicate:** Group 10 · Intake 43 · Department of Biosystems Technology · Faculty of Technology
 * **Institution:** General Sir John Kotelawala Defence University (KDU), Kandawala Estate, Ratmalana, Sri Lanka.  
 * **Academic Year:** 2026

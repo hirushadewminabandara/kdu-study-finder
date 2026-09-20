@@ -616,7 +616,7 @@ insert into public.courses (id, department_id, code, title, year_of_study) value
   (109, 41, 'ICT2133', 'Operating Systems & Linux Administration', 2),
   (110, 41, 'ICT2213', 'Software Engineering Principles', 2),
   (111, 41, 'ICT2223', 'Mobile Application Development', 2),
-  (112, 41, 'ICT2282', 'Skill Development Project II (SDP II)', 2),
+  (112, 41, 'ICT2282', 'Skill Development Project (Second iteration)', 2),
   (113, 41, 'EN1022', 'Professional English for Technology', 2),
   (114, 41, 'DL1012', 'Military Studies & Leadership', 2),
   -- Faculty of Criminal Justice: DCCJ & DLE

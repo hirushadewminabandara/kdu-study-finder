@@ -558,7 +558,7 @@ const KDU_CATALOG = [
           { id: 109, code: "ICT2133", title: "Operating Systems & Linux Administration", year: 2 },
           { id: 110, code: "ICT2213", title: "Software Engineering Principles", year: 2 },
           { id: 111, code: "ICT2223", title: "Mobile Application Development", year: 2 },
-          { id: 112, code: "ICT2282", title: "Skill Development Project II (SDP II)", year: 2 },
+          { id: 112, code: "ICT2282", title: "Skill Development Project (Second iteration)", year: 2 },
           { id: 113, code: "EN1022", title: "Professional English for Technology", year: 2 },
           { id: 114, code: "DL1012", title: "Military Studies & Leadership", year: 2 }
         ]
