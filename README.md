@@ -620,20 +620,20 @@ Use this sequence during your lecture viva presentation:
 │       │                      │ Google OAuth sign-in restricted to @kdu.ac.lk."  │
 ├───────┼──────────────────────┼──────────────────────────────────────────────────┤
 │ 2     │ Click [Sign In with  │ "Signing in with a verified KDU university       │
-│       │ University Google    │ Google account. The system enforces domain        │
+│       │ University Google    │ Google account. The system enforces domain       │
 │       │ (@kdu.ac.lk)]        │ restriction — only @kdu.ac.lk emails are         │
 │       │                      │ accepted via Google OAuth `hd` parameter."       │
 ├───────┼──────────────────────┼──────────────────────────────────────────────────┤
 │ 3     │ Complete profile     │ "After authentication, the student sets up their │
-│       │ setup on profile.html│ academic profile: faculty, department, courses,   │
-│       │                      │ and the 7×3 weekly availability grid."            │
+│       │ setup on profile.html│ academic profile: faculty, department, courses,  │
+│       │                      │ and the 7×3 weekly availability grid."           │
 ├───────┼──────────────────────┼──────────────────────────────────────────────────┤
 │ 4     │ Inspect Match Cards  │ "Notice the Explainability badge: it explicitly  │
-│       │ on dashboard.html    │ states shared modules and overlapping study       │
-│       │                      │ windows. The 60/40 algorithm is fully visible."   │
+│       │ on dashboard.html    │ states shared modules and overlapping study      │
+│       │                      │ windows. The 60/40 algorithm is fully visible.   │
 ├───────┼──────────────────────┼──────────────────────────────────────────────────┤
 │ 5     │ Open group.html      │ "Entering a study syndicate: here we see the     │
-│       │ (Syndicate Hub)      │ member roster, real-time message chat, and the    │
+│       │ (Syndicate Hub)      │ member roster, real-time message chat, and the   │
 │       │                      │ scheduled study sessions calendar."              │
 └───────┴──────────────────────┴──────────────────────────────────────────────────┘
 ```
