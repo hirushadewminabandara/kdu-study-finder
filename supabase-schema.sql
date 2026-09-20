@@ -200,41 +200,56 @@ alter table public.messages enable row level security;
 alter table public.study_sessions enable row level security;
 
 -- Public Reference Catalogs: Read-only for all authenticated students
+drop policy if exists "Allow read faculties" on public.faculties;
 create policy "Allow read faculties" on public.faculties for select using (true);
+
+drop policy if exists "Allow read departments" on public.departments;
 create policy "Allow read departments" on public.departments for select using (true);
+
+drop policy if exists "Allow read courses" on public.courses;
 create policy "Allow read courses" on public.courses for select using (true);
 
 -- Profiles
+drop policy if exists "Allow authenticated read profiles" on public.profiles;
 create policy "Allow authenticated read profiles" on public.profiles
   for select using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow user to update own profile" on public.profiles;
 create policy "Allow user to update own profile" on public.profiles
   for update using (auth.uid() = id);
 
+drop policy if exists "Allow user to insert own profile" on public.profiles;
 create policy "Allow user to insert own profile" on public.profiles
   for insert with check (auth.uid() = id);
 
 -- Student Courses
+drop policy if exists "Allow authenticated read student_courses" on public.student_courses;
 create policy "Allow authenticated read student_courses" on public.student_courses
   for select using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow manage own student_courses" on public.student_courses;
 create policy "Allow manage own student_courses" on public.student_courses
   for all using (auth.uid() = student);
 
 -- Availability
+drop policy if exists "Allow authenticated read availability" on public.availability;
 create policy "Allow authenticated read availability" on public.availability
   for select using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow manage own availability" on public.availability;
 create policy "Allow manage own availability" on public.availability
   for all using (auth.uid() = student);
 
 -- Groups
+drop policy if exists "Allow read open or member groups" on public.groups;
 create policy "Allow read open or member groups" on public.groups
   for select using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow authenticated create groups" on public.groups;
 create policy "Allow authenticated create groups" on public.groups
   for insert with check (auth.uid() = created_by);
 
+drop policy if exists "Allow leader or admin to update groups" on public.groups;
 create policy "Allow leader or admin to update groups" on public.groups
   for update using (
     auth.uid() = created_by or
@@ -242,16 +257,20 @@ create policy "Allow leader or admin to update groups" on public.groups
   );
 
 -- Group Members
+drop policy if exists "Allow read group members" on public.group_members;
 create policy "Allow read group members" on public.group_members
   for select using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow join group members" on public.group_members;
 create policy "Allow join group members" on public.group_members
   for insert with check (auth.uid() = student);
 
+drop policy if exists "Allow leave group" on public.group_members;
 create policy "Allow leave group" on public.group_members
   for delete using (auth.uid() = student);
 
 -- Join Requests
+drop policy if exists "Allow read join requests" on public.join_requests;
 create policy "Allow read join requests" on public.join_requests
   for select using (
     auth.uid() = student or
@@ -265,9 +284,11 @@ create policy "Allow read join requests" on public.join_requests
     )
   );
 
+drop policy if exists "Allow student insert join requests" on public.join_requests;
 create policy "Allow student insert join requests" on public.join_requests
   for insert with check (auth.uid() = student);
 
+drop policy if exists "Allow group leader or admin to update request status" on public.join_requests;
 create policy "Allow group leader or admin to update request status" on public.join_requests
   for update using (
     exists (
@@ -281,6 +302,7 @@ create policy "Allow group leader or admin to update request status" on public.j
   );
 
 -- Messages
+drop policy if exists "Allow members to read group messages" on public.messages;
 create policy "Allow members to read group messages" on public.messages
   for select using (
     exists (
@@ -289,6 +311,7 @@ create policy "Allow members to read group messages" on public.messages
     )
   );
 
+drop policy if exists "Allow members to insert group messages" on public.messages;
 create policy "Allow members to insert group messages" on public.messages
   for insert with check (
     auth.uid() = sender and
@@ -299,9 +322,11 @@ create policy "Allow members to insert group messages" on public.messages
   );
 
 -- Study Sessions
+drop policy if exists "Allow read study sessions" on public.study_sessions;
 create policy "Allow read study sessions" on public.study_sessions
   for select using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow members to create study sessions" on public.study_sessions;
 create policy "Allow members to create study sessions" on public.study_sessions
   for insert with check (
     exists (
@@ -311,17 +336,40 @@ create policy "Allow members to create study sessions" on public.study_sessions
   );
 
 -- ==============================================================================
--- ENABLE SUPABASE REALTIME REPLICATION
+-- ENABLE SUPABASE REALTIME REPLICATION & REPLICA IDENTITY
 -- ==============================================================================
-begin;
-  drop publication if exists supabase_realtime;
-  create publication supabase_realtime;
-commit;
+alter table public.messages replica identity full;
+alter table public.groups replica identity full;
+alter table public.join_requests replica identity full;
+alter table public.study_sessions replica identity full;
 
-alter publication supabase_realtime add table public.messages;
-alter publication supabase_realtime add table public.groups;
-alter publication supabase_realtime add table public.join_requests;
-alter publication supabase_realtime add table public.study_sessions;
+do $$
+begin
+  if not exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    create publication supabase_realtime;
+  end if;
+end;
+$$;
+
+do $$
+begin
+  begin
+    alter publication supabase_realtime add table public.messages;
+  exception when duplicate_object then null;
+  end;
+  begin
+    alter publication supabase_realtime add table public.groups;
+  exception when duplicate_object then null;
+  end;
+  begin
+    alter publication supabase_realtime add table public.join_requests;
+  exception when duplicate_object then null;
+  end;
+  begin
+    alter publication supabase_realtime add table public.study_sessions;
+  exception when duplicate_object then null;
+  end;
+end $$;
 
 -- ==============================================================================
 -- REFERENCE DATA SEED: KDU ACADEMIC CATALOG (No demo users, no mock data)
