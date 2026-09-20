@@ -1,6 +1,6 @@
 # KDU StudyConnect — Academic Technical Specification & Project Documentation
 > **General Sir John Kotelawala Defence University (KDU), Sri Lanka**  
-> **Faculty of Technology (FOT) · Department of Information and Communication Technology (DICT)**  
+> **Faculty of Technology (FOT) · Department of Biosystems Technology (DBST)**  
 > **Bachelor of Technology (Hons) in Information and Communication Technology (BTech Hons in ICT)**  
 > **Module:** Skill Development Project II (`ICT2282`)  
 > **Cohort:** Intake 43 · Group 10  
@@ -60,7 +60,7 @@ Traditional methods for forming study syndicates rely heavily on informal WhatsA
 
 ## 2. Project Team Roster & Academic Roles
 
-**Faculty of Technology (FOT) · Department of Information and Communication Technology (DICT)**  
+**Faculty of Technology (FOT) · Department of Biosystems Technology (DBST)**  
 **BTech (Hons) in ICT · Intake 43 · Group 10**
 
 ```
@@ -320,35 +320,37 @@ function getStudentCategory(indexNo) {
 
 ### 4.2 Faculties, Departments & Curricula Architecture
 
-The database catalogs the complete KDU organizational hierarchy:
+The database catalogs the complete KDU organizational hierarchy across all 12 faculties:
 
 ```mermaid
 graph LR
-    KDU[General Sir John Kotelawala Defence University] --> FOT[Faculty of Technology]
-    KDU --> FOC[Faculty of Computing]
-    KDU --> FOE[Faculty of Engineering]
-    KDU --> FMSH[Faculty of Management, Soc Sci & Hum]
-    KDU --> FAHS[Faculty of Allied Health Sciences]
-    KDU --> FOL[Faculty of Law]
-    KDU --> FBESS[Faculty of Built Environment & Spatial Sciences]
+    KDU[General Sir John Kotelawala Defence University] --> FDSS[1. Faculty of Defence and Strategic Studies]
+    KDU --> FOM[2. Faculty of Medicine]
+    KDU --> FOE[3. Faculty of Engineering]
+    KDU --> FOC[4. Faculty of Computing]
+    KDU --> FMSH[5. Faculty of Management, Social Sciences & Humanities]
+    KDU --> FOL[6. Faculty of Law]
+    KDU --> FAHS[7. Faculty of Allied Health Sciences]
+    KDU --> FBESS[8. Faculty of Built Environment & Spatial Sciences]
+    KDU --> FOT[9. Faculty of Technology]
+    KDU --> FCJ[10. Faculty of Criminal Justice]
+    KDU --> FIS[11. Faculty of Industrial Studies]
+    KDU --> FGS[12. Faculty of Graduate Studies]
 
-    FOT --> DICT[Dept of Information & Comm Tech]
     FOT --> DBST[Dept of Biosystems Technology]
     FOT --> DET[Dept of Engineering Technology]
 
-    FOC --> DCS[Dept of Computer Science]
-    FOC --> DIT[Dept of Information Technology]
-    FOC --> DCE[Dept of Computer Engineering]
-    FOC --> DCM[Dept of Computational Mathematics]
+    DBST --> P1["Programme: BTech (Hons) in ICT"]
+    DBST --> P2["Programme: BBST (Hons) in Applied Biotechnology"]
 
-    DICT --> M1[ICT2282: Skill Development Project II]
-    DICT --> M2[ICT1223: Data Structures & Algorithms]
-    DICT --> M3[ICT1233: Database Management Systems]
-    DICT --> M4[ICT2123: Computer Networks & Data Comm]
-    DICT --> M5[ICT2133: Operating Systems & Linux Admin]
-    DICT --> M6[ICT1133: Mathematics for Technology]
-    DICT --> M7[ICT2113: Web Technologies & Applications]
-    DICT --> M8[ICT2213: Software Engineering Principles]
+    DBST --> M1[ICT2282: Skill Development Project II]
+    DBST --> M2[ICT1223: Data Structures & Algorithms]
+    DBST --> M3[ICT1233: Database Management Systems]
+    DBST --> M4[ICT2123: Computer Networks & Data Comm]
+    DBST --> M5[ICT2133: Operating Systems & Linux Admin]
+    DBST --> M6[ICT1133: Mathematics for Technology]
+    DBST --> M7[ICT2113: Web Technologies & Applications]
+    DBST --> M8[ICT2213: Software Engineering Principles]
 ```
 
 ---
@@ -668,7 +670,7 @@ Use this sequence during your lecture viva presentation:
 ### 9.2 Supabase Configuration
 
 1. **Create a Supabase project** at [supabase.com/dashboard](https://supabase.com/dashboard).
-2. **Run the database schema** — Open the Supabase SQL Editor and paste the contents of [`supabase-schema.sql`](file:///C:/Users/ACER/OneDrive/Desktop/REPO/kdu-study-finder/supabase-schema.sql). This creates all tables, RLS policies, triggers, and seeds the verified KDU academic catalog (7 faculties, 25 departments, 100+ courses).
+2. **Run the database schema** — Open the Supabase SQL Editor and paste the contents of [`supabase-schema.sql`](file:///C:/Users/ACER/OneDrive/Desktop/REPO/kdu-study-finder/supabase-schema.sql). This creates all tables, RLS policies, triggers, and seeds the verified KDU academic catalog (12 faculties, 45 departments, 130+ courses).
 3. **Set your credentials** — Update [`config.js`](file:///C:/Users/ACER/OneDrive/Desktop/REPO/kdu-study-finder/config.js) with your Supabase project URL and Anon Key:
    ```javascript
    const SUPABASE_URL = "https://YOUR_PROJECT_REF.supabase.co";
@@ -787,6 +789,6 @@ ALTER TABLE public.study_sessions REPLICA IDENTITY FULL;
 
 ## 📜 Intellectual Property & University Citation
 * **Project:** KDU StudyConnect (Skill Development Project II)
-* **Authoring Syndicate:** Group 10 · Intake 43 · Department of Information and Communication Technology · Faculty of Technology
+* **Authoring Syndicate:** Group 10 · Intake 43 · Department of Biosystems Technology · Faculty of Technology
 * **Institution:** General Sir John Kotelawala Defence University (KDU), Kandawala Estate, Ratmalana, Sri Lanka.  
 * **Academic Year:** 2026
