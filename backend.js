@@ -1015,6 +1015,7 @@ async function syncFromSupabase() {
           role: isAdm ? "admin" : (p.role || "student"),
           facultyId: p.faculty_id || null,
           departmentId: p.department_id || null,
+          programme: p.programme || (existingLocal && existingLocal.programme) || "",
           intake: p.intake || "43",
           year: p.year_of_study || 2,
           bio: p.bio || "",
@@ -1163,6 +1164,7 @@ async function initBackend() {
               role: isAdm ? "admin" : (profile.role || "student"),
               facultyId: profile.faculty_id || null,
               departmentId: profile.department_id || null,
+              programme: profile.programme || "",
               intake: profile.intake || "43",
               year: profile.year_of_study || 2,
               bio: profile.bio || "",
@@ -1204,6 +1206,7 @@ async function initBackend() {
             role: isAdm ? "admin" : "student",
             facultyId: null,
             departmentId: null,
+            programme: "",
             intake: "43",
             year: 2,
             bio: "",
@@ -1611,6 +1614,7 @@ async function updateUserProfile(id, patch) {
     avatarUrl: patch.avatarUrl !== undefined ? patch.avatarUrl : (u.avatarUrl || ""),
     facultyId: patch.facultyId !== undefined ? Number(patch.facultyId) : u.facultyId,
     departmentId: patch.departmentId !== undefined ? Number(patch.departmentId) : u.departmentId,
+    programme: patch.programme !== undefined ? patch.programme : (u.programme || ""),
     intake: patch.intake !== undefined ? String(patch.intake) : u.intake,
     year: patch.year !== undefined ? Number(patch.year) : u.year,
     bio: patch.bio !== undefined ? patch.bio : u.bio,
@@ -1635,7 +1639,12 @@ async function updateUserProfile(id, patch) {
         year_of_study: u.year,
         bio: u.bio
       };
-      await sbClient.from("profiles").update(updatePayload).eq("id", id);
+
+      // Resilient update with programme if supported by database schema
+      let updateRes = await sbClient.from("profiles").update(Object.assign({}, updatePayload, { programme: u.programme || "" })).eq("id", id);
+      if (updateRes && updateRes.error) {
+        await sbClient.from("profiles").update(updatePayload).eq("id", id);
+      }
 
       // Sync student_courses
       if (Array.isArray(patch.courses)) {

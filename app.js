@@ -439,6 +439,11 @@ function initProfilePage() {
   const deptSelect = $("#p-department");
   const intakeSelect = $("#p-intake");
   const yearSelect = $("#p-year");
+  const programmeSelect = $("#p-programme");
+  const intakeYearHint = $("#intake-year-hint");
+  const yearFilterTabs = $("#year-filter-tabs");
+  const selectedCountBadge = $("#selected-count-badge");
+  const activeFilterBadge = $("#active-filter-badge");
   const bioInput = $("#bioInput");
   const moduleContainer = $("#moduleSelector");
   const availGrid = $("#avail-grid");
@@ -578,6 +583,26 @@ function initProfilePage() {
     updateBadgePreview();
   }
 
+  // Selected course IDs state tracking (preserves selections across year tab filters)
+  const selectedCourseIds = new Set((user.courses || []).map(Number));
+  let activeYearFilter = "current"; // 'current', 'all', '1', '2', '3', '4'
+
+  function intakeToYear(itk) {
+    const n = parseInt(itk, 10);
+    if (n >= 44) return 1;
+    if (n === 43) return 2;
+    if (n === 42) return 3;
+    if (n <= 41) return 4;
+    return 2;
+  }
+
+  function updateIntakeHint() {
+    if (!intakeYearHint || !intakeSelect) return;
+    const itk = intakeSelect.value;
+    const calcYear = intakeToYear(itk);
+    intakeYearHint.textContent = "Intake " + itk + " = Year " + calcYear;
+  }
+
   // Populate Intakes (39 to 44)
   if (intakeSelect) {
     intakeSelect.innerHTML = INTAKES.map(function (itk) {
@@ -599,42 +624,161 @@ function initProfilePage() {
     }).join("");
   }
 
+  function updateBadges(displayedCount) {
+    if (selectedCountBadge) {
+      const count = selectedCourseIds.size;
+      selectedCountBadge.textContent = count + (count === 1 ? " module selected" : " modules selected");
+    }
+    if (activeFilterBadge) {
+      const curYear = Number(yearSelect ? yearSelect.value : (user.year || 2));
+      const curItk = intakeSelect ? intakeSelect.value : (user.intake || "43");
+      if (activeYearFilter === "current") {
+        activeFilterBadge.textContent = "Year " + curYear + " (Intake " + curItk + ") • " + displayedCount + " modules";
+      } else if (activeYearFilter === "all") {
+        activeFilterBadge.textContent = "All Academic Years • " + displayedCount + " modules";
+      } else {
+        activeFilterBadge.textContent = "Year " + activeYearFilter + " Curriculum • " + displayedCount + " modules";
+      }
+    }
+  }
+
+  function updateYearTabsUI() {
+    if (!yearFilterTabs) return;
+    const buttons = yearFilterTabs.querySelectorAll(".year-tab-btn");
+    buttons.forEach(function (btn) {
+      const tabYear = btn.getAttribute("data-year");
+      const isActive = tabYear === activeYearFilter;
+      if (isActive) {
+        btn.className = "year-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-on-primary transition-all shadow-sm";
+      } else {
+        btn.className = "year-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all";
+      }
+    });
+  }
+
+  function renderProgrammes(deptId, selectedProg) {
+    if (!programmeSelect) return;
+    const dept = deptById(deptId);
+    if (!dept || !dept.programme) {
+      programmeSelect.innerHTML = '<option value="">Standard Degree Curriculum</option>';
+      return;
+    }
+    const progs = dept.programme.split("/").map(function (s) { return s.trim(); }).filter(Boolean);
+    if (progs.length === 0) {
+      programmeSelect.innerHTML = '<option value="' + esc(dept.programme) + '">' + esc(dept.programme) + '</option>';
+      return;
+    }
+
+    let chosenProg = selectedProg || user.programme || "";
+    if (!chosenProg) {
+      if ((user.indexNo && user.indexNo.toUpperCase().includes("ICT")) || (user.email && user.email.toLowerCase().includes("ict"))) {
+        const ictMatch = progs.find(function (p) { return p.includes("ICT"); });
+        if (ictMatch) chosenProg = ictMatch;
+      }
+    }
+    if (!chosenProg || !progs.some(function (p) { return p === chosenProg; })) {
+      chosenProg = progs[0];
+    }
+
+    programmeSelect.innerHTML = progs.map(function (p) {
+      return '<option value="' + esc(p) + '"' + (p === chosenProg ? ' selected' : '') + '>' + esc(p) + '</option>';
+    }).join("");
+  }
+
   function renderDepartments(facultyId, selectedDeptId) {
     if (!deptSelect) return;
     const fac = facultyById(facultyId);
-    if (!fac) {
+    if (!fac || !fac.departments || !fac.departments.length) {
       deptSelect.innerHTML = '<option value="">Select faculty first…</option>';
+      renderProgrammes(null);
       renderCourseModules(null);
       return;
     }
     deptSelect.innerHTML = fac.departments.map(function (d) {
       return '<option value="' + d.id + '"' + (Number(selectedDeptId) === d.id ? ' selected' : '') + '>' + esc(d.name) + '</option>';
     }).join("");
-    renderCourseModules(Number(deptSelect.value));
+    const activeDeptId = Number(deptSelect.value);
+    renderProgrammes(activeDeptId, user.programme);
+    renderCourseModules(activeDeptId);
   }
 
   function renderCourseModules(deptId) {
     if (!moduleContainer) return;
     const dept = deptById(deptId);
     if (!dept || !dept.courses || !dept.courses.length) {
-      moduleContainer.innerHTML = '<p class="text-on-surface-variant text-sm col-span-full py-4">No course modules listed for this department.</p>';
+      moduleContainer.innerHTML = '<div class="col-span-full py-8 text-center bg-surface-container-low/50 rounded-2xl border border-dashed border-outline-variant">' +
+        '<span class="material-symbols-outlined text-3xl text-on-surface-variant mb-2">menu_book</span>' +
+        '<p class="text-sm font-semibold text-on-surface">No course modules listed for this department.</p>' +
+        '<p class="text-xs text-on-surface-variant mt-1">Select another department or faculty to browse courses.</p>' +
+      '</div>';
+      updateBadges(0);
       return;
     }
 
-    const currentCourses = user.courses || [];
-    moduleContainer.innerHTML = dept.courses.map(function (c) {
-      const isSelected = currentCourses.includes(c.id);
+    const currentYear = Number(yearSelect ? yearSelect.value : (user.year || 2));
+    const selectedProg = programmeSelect ? programmeSelect.value : (user.programme || "");
+
+    let filteredCourses = dept.courses.slice();
+
+    if (selectedProg) {
+      if (selectedProg.includes("ICT")) {
+        filteredCourses = filteredCourses.filter(function (c) {
+          return c.code.startsWith("ICT") || c.code.startsWith("EN") || c.code.startsWith("DL");
+        });
+      } else if (selectedProg.includes("BBST")) {
+        filteredCourses = filteredCourses.filter(function (c) {
+          return c.code.startsWith("BST") || c.code.startsWith("EN") || c.code.startsWith("DL");
+        });
+      }
+    }
+
+    if (activeYearFilter === "current") {
+      filteredCourses = filteredCourses.filter(function (c) {
+        return Number(c.year) === currentYear;
+      });
+    } else if (activeYearFilter !== "all") {
+      const targetYear = Number(activeYearFilter);
+      filteredCourses = filteredCourses.filter(function (c) {
+        return Number(c.year) === targetYear;
+      });
+    }
+
+    updateBadges(filteredCourses.length);
+
+    if (filteredCourses.length === 0) {
+      moduleContainer.innerHTML = '<div class="col-span-full py-8 text-center bg-surface-container-low/50 rounded-2xl border border-dashed border-outline-variant">' +
+        '<span class="material-symbols-outlined text-3xl text-on-surface-variant mb-2">filter_alt_off</span>' +
+        '<p class="text-sm font-semibold text-on-surface">No course modules found for ' +
+          (activeYearFilter === "current" ? "Year " + currentYear : (activeYearFilter === "all" ? "this selection" : "Year " + activeYearFilter)) + '.</p>' +
+        '<p class="text-xs text-on-surface-variant mt-1">Click <button type="button" class="text-primary font-bold underline cursor-pointer" id="btn-show-all-courses">All Modules</button> to view all curriculum units for this degree.</p>' +
+      '</div>';
+      const showAllBtn = $("#btn-show-all-courses", moduleContainer);
+      if (showAllBtn) {
+        showAllBtn.addEventListener("click", function () {
+          activeYearFilter = "all";
+          updateYearTabsUI();
+          renderCourseModules(deptId);
+        });
+      }
+      return;
+    }
+
+    moduleContainer.innerHTML = filteredCourses.map(function (c) {
+      const isSelected = selectedCourseIds.has(Number(c.id));
       return '<button type="button" class="module-chip flex items-center justify-between p-3.5 rounded-xl border-2 transition-all text-left ' +
         (isSelected
-          ? 'bg-surface-container text-primary border-primary shadow-sm'
-          : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant hover:border-outline') + '" ' +
+          ? 'bg-surface-container text-primary border-primary shadow-sm ring-1 ring-primary/20'
+          : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant hover:border-primary/50 hover:bg-surface-container-low/40') + '" ' +
         'data-id="' + c.id + '" data-selected="' + isSelected + '">' +
         '<div class="flex flex-col min-w-0 pr-3">' +
-          '<span class="font-mono text-xs font-bold truncate text-primary">' + esc(c.code) + '</span>' +
-          '<span class="text-sm font-semibold text-on-surface leading-snug line-clamp-1">' + esc(c.title) + '</span>' +
-          '<span class="text-[11px] text-on-surface-variant mt-0.5">Year ' + (c.year || 2) + ' Unit</span>' +
+          '<div class="flex items-center gap-2">' +
+            '<span class="font-mono text-xs font-bold truncate text-primary">' + esc(c.code) + '</span>' +
+            '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant">Year ' + (c.year || 1) + '</span>' +
+          '</div>' +
+          '<span class="text-sm font-semibold text-on-surface leading-snug line-clamp-1 mt-0.5">' + esc(c.title) + '</span>' +
+          '<span class="text-[11px] text-on-surface-variant mt-0.5">Semester Unit • Year ' + (c.year || 1) + '</span>' +
         '</div>' +
-        '<span class="material-symbols-outlined text-[20px] ' + (isSelected ? 'text-primary' : 'text-outline-variant') + '">' +
+        '<span class="material-symbols-outlined text-[22px] shrink-0 ' + (isSelected ? 'text-primary' : 'text-outline-variant') + '">' +
           (isSelected ? 'check_circle' : 'add_circle') +
         '</span>' +
       '</button>';
@@ -648,22 +792,71 @@ function initProfilePage() {
   }
   if (deptSelect) {
     deptSelect.addEventListener("change", function () {
-      renderCourseModules(Number(deptSelect.value));
+      const activeDeptId = Number(deptSelect.value);
+      renderProgrammes(activeDeptId, null);
+      renderCourseModules(activeDeptId);
+    });
+  }
+  if (programmeSelect) {
+    programmeSelect.addEventListener("change", function () {
+      renderCourseModules(Number(deptSelect ? deptSelect.value : 1));
+    });
+  }
+  if (intakeSelect) {
+    intakeSelect.addEventListener("change", function () {
+      const newYear = intakeToYear(intakeSelect.value);
+      if (yearSelect) yearSelect.value = String(newYear);
+      updateIntakeHint();
+      renderCourseModules(Number(deptSelect ? deptSelect.value : 1));
+    });
+  }
+  if (yearSelect) {
+    yearSelect.addEventListener("change", function () {
+      updateIntakeHint();
+      renderCourseModules(Number(deptSelect ? deptSelect.value : 1));
     });
   }
 
-  // Initialize cascade
-  const initFacId = user.facultyId || 1;
-  const initDeptId = user.departmentId || 1;
+  if (yearFilterTabs) {
+    yearFilterTabs.addEventListener("click", function (e) {
+      const btn = e.target.closest(".year-tab-btn");
+      if (!btn) return;
+      activeYearFilter = btn.getAttribute("data-year") || "all";
+      updateYearTabsUI();
+      renderCourseModules(Number(deptSelect ? deptSelect.value : 1));
+    });
+  }
+
+  // Initialize cascade with smart defaults
+  let initFacId = user.facultyId;
+  let initDeptId = user.departmentId;
+  if (!initFacId || initFacId === 1) {
+    if ((user.indexNo && user.indexNo.toUpperCase().includes("ICT")) || (user.email && user.email.toLowerCase().includes("ict"))) {
+      initFacId = 9;
+      initDeptId = 41;
+    } else if (!initFacId) {
+      initFacId = 9;
+      initDeptId = 41;
+    }
+  }
+
   if (facultySelect) facultySelect.value = String(initFacId);
   renderDepartments(initFacId, initDeptId);
+  updateIntakeHint();
+  updateYearTabsUI();
 
   // Module Click Toggle
   if (moduleContainer) {
     moduleContainer.addEventListener("click", function (e) {
       const chip = e.target.closest(".module-chip");
       if (!chip) return;
-      const isCurrentlySelected = chip.getAttribute("data-selected") === "true";
+      const id = Number(chip.getAttribute("data-id"));
+      const isCurrentlySelected = selectedCourseIds.has(id);
+      if (isCurrentlySelected) {
+        selectedCourseIds.delete(id);
+      } else {
+        selectedCourseIds.add(id);
+      }
       const nextState = !isCurrentlySelected;
       chip.setAttribute("data-selected", String(nextState));
 
@@ -671,6 +864,8 @@ function initProfilePage() {
       chip.classList.toggle("text-primary", nextState);
       chip.classList.toggle("border-primary", nextState);
       chip.classList.toggle("shadow-sm", nextState);
+      chip.classList.toggle("ring-1", nextState);
+      chip.classList.toggle("ring-primary/20", nextState);
 
       chip.classList.toggle("bg-surface-container-lowest", !nextState);
       chip.classList.toggle("text-on-surface-variant", !nextState);
@@ -682,6 +877,7 @@ function initProfilePage() {
         icon.classList.toggle("text-primary", nextState);
         icon.classList.toggle("text-outline-variant", !nextState);
       }
+      updateBadges(moduleContainer.querySelectorAll(".module-chip").length);
     });
   }
 
@@ -714,8 +910,7 @@ function initProfilePage() {
   // Save Profile Handler
   if (saveBtn) {
     saveBtn.addEventListener("click", async function () {
-      const selectedCourses = $$(".module-chip[data-selected='true']", moduleContainer)
-        .map(function (el) { return Number(el.getAttribute("data-id")); });
+      const selectedCourses = Array.from(selectedCourseIds);
       const selectedAvail = $$(".avail-check:checked", availGrid)
         .map(function (el) { return el.value; });
 
@@ -746,8 +941,9 @@ function initProfilePage() {
         name: nameVal,
         indexNo: indexVal,
         avatarUrl: activeAvatarUrl,
-        facultyId: Number(facultySelect?.value) || 1,
-        departmentId: Number(deptSelect?.value) || 1,
+        facultyId: Number(facultySelect?.value) || 9,
+        departmentId: Number(deptSelect?.value) || 41,
+        programme: programmeSelect?.value || "",
         intake: intakeSelect?.value || "43",
         year: Number(yearSelect?.value) || 2,
         bio: bioInput?.value || "",

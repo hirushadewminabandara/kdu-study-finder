@@ -148,12 +148,12 @@
           <div class="flex items-center justify-between border-b border-outline-variant/60 pb-3">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 rounded bg-surface-container text-primary text-xs font-bold flex items-center justify-center">2</span>
-              <h2 class="text-base font-bold text-primary">Faculty, Department &amp; Intake</h2>
+              <h2 class="text-base font-bold text-primary">Faculty, Department, Degree &amp; Intake</h2>
             </div>
             <span class="text-[11px] uppercase tracking-wider text-on-surface-variant font-medium">Academic Hierarchy</span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div class="flex flex-col">
               <label for="p-faculty" class="text-xs font-semibold text-on-surface mb-1.5">Faculty</label>
               <select id="p-faculty" class="h-10 px-2.5 text-xs font-medium text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors cursor-pointer">
@@ -161,13 +161,25 @@
               </select>
             </div>
             <div class="flex flex-col">
-              <label for="p-department" class="text-xs font-semibold text-on-surface mb-1.5">Department &amp; Degree</label>
+              <label for="p-department" class="text-xs font-semibold text-on-surface mb-1.5">Department</label>
               <select id="p-department" class="h-10 px-2.5 text-xs font-medium text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors cursor-pointer">
                 <!-- Dynamically populated cascade -->
               </select>
             </div>
+            <div class="flex flex-col sm:col-span-2 lg:col-span-1">
+              <label for="p-programme" class="text-xs font-semibold text-on-surface mb-1.5 flex items-center justify-between">
+                <span>Degree Programme</span>
+                <span class="text-[10px] text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded">Active Curriculum</span>
+              </label>
+              <select id="p-programme" class="h-10 px-2.5 text-xs font-medium text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors cursor-pointer">
+                <!-- Dynamically populated based on selected Department -->
+              </select>
+            </div>
             <div class="flex flex-col">
-              <label for="p-intake" class="text-xs font-semibold text-on-surface mb-1.5">Intake</label>
+              <label for="p-intake" class="text-xs font-semibold text-on-surface mb-1.5 flex items-center justify-between">
+                <span>Intake</span>
+                <span id="intake-year-hint" class="text-[10px] text-on-surface-variant font-normal">Intake 43 = Year 2</span>
+              </label>
               <select id="p-intake" class="h-10 px-2.5 text-xs font-medium text-on-surface bg-surface-container-lowest border border-outline-variant/80 rounded-xl focus:border-primary focus:outline-none transition-colors cursor-pointer">
                 <!-- Intakes 39 to 44 -->
               </select>
@@ -193,12 +205,32 @@
 
           <div class="bg-surface-container-low px-4 py-3 rounded-xl flex items-center gap-3 border border-outline-variant/60 text-xs text-on-surface-variant">
             <span class="material-symbols-outlined text-[18px] text-primary shrink-0">info</span>
-            <span>Click to select or deselect modules for your active semester. The matching algorithm evaluates overlap against these exact course codes.</span>
+            <span>Select the course modules you are studying this semester. Changing your Year of Study or Intake automatically adjusts the recommended modules below.</span>
+          </div>
+
+          <!-- Year Filter Bar & Context Badge -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <div class="flex items-center gap-1.5 bg-surface-container-low p-1 rounded-xl border border-outline-variant/60" id="year-filter-tabs">
+              <button type="button" data-year="current" class="year-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-on-primary transition-all shadow-sm">My Year Only</button>
+              <button type="button" data-year="all" class="year-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">All Modules</button>
+              <button type="button" data-year="1" class="year-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">Year 1</button>
+              <button type="button" data-year="2" class="year-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">Year 2</button>
+              <button type="button" data-year="3" class="year-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">Year 3</button>
+              <button type="button" data-year="4" class="year-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">Year 4</button>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="selected-count-badge" class="text-xs font-semibold text-on-surface-variant">
+                0 modules selected
+              </span>
+              <span id="active-filter-badge" class="text-xs text-primary font-bold bg-surface-container px-3 py-1 rounded-full border border-primary/20">
+                Loading...
+              </span>
+            </div>
           </div>
 
           <!-- Dynamic Module Selector Grid -->
           <div id="moduleSelector" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            <!-- Populated dynamically based on selected Department & Degree -->
+            <!-- Populated dynamically based on selected Department, Degree & Year -->
           </div>
         </section>
 
