@@ -33,70 +33,255 @@ const INTAKES = ["39", "40", "41", "42", "43", "44"];
 const KDU_CATALOG = [
   {
     id: 1,
-    name: "Faculty of Technology",
-    code: "FOT",
+    name: "Faculty of Defence and Strategic Studies",
+    code: "FDSS",
     departments: [
       {
         id: 1,
-        name: "Department of Information and Communication Technology",
-        code: "DICT",
-        programme: "Bachelor of Technology Honours in Information and Communication Technology (BTech Hons in ICT)",
+        name: "Department of Strategic Studies",
+        code: "DSS",
+        programme: "BSc in Strategic Studies & International Relations",
         courses: [
-          { id: 101, code: "ICT1113", title: "Fundamentals of Programming", year: 1 },
-          { id: 102, code: "ICT1123", title: "Computer Systems & Architecture", year: 1 },
-          { id: 103, code: "ICT1133", title: "Mathematics for Technology", year: 1 },
-          { id: 104, code: "ICT1213", title: "Object Oriented Programming", year: 1 },
-          { id: 105, code: "ICT1223", title: "Data Structures & Algorithms", year: 1 },
-          { id: 106, code: "ICT1233", title: "Database Management Systems", year: 1 },
-          { id: 107, code: "ICT2113", title: "Web Technologies & Applications", year: 2 },
-          { id: 108, code: "ICT2123", title: "Computer Networks & Data Communications", year: 2 },
-          { id: 109, code: "ICT2133", title: "Operating Systems & Linux Administration", year: 2 },
-          { id: 110, code: "ICT2213", title: "Software Engineering Principles", year: 2 },
-          { id: 111, code: "ICT2223", title: "Mobile Application Development", year: 2 },
-          { id: 112, code: "ICT2282", title: "Skill Development Project II (SDP II)", year: 2 },
-          { id: 113, code: "EN1022", title: "Professional English for Technology", year: 2 },
-          { id: 114, code: "DL1012", title: "Military Studies & Leadership", year: 2 }
+          { id: 801, code: "DSS1013", title: "Introduction to Strategic Studies", year: 1 },
+          { id: 802, code: "DSS2013", title: "National Security & Geopolitical Strategy", year: 2 },
+          { id: 803, code: "DSS3013", title: "Maritime Security & Regional Dynamics", year: 3 }
         ]
       },
       {
         id: 2,
-        name: "Department of Biosystems Technology",
-        code: "DBST",
-        programme: "Bachelor of Biosystems Technology Honours in Applied Biotechnology (BBST Hons)",
+        name: "Department of Military Studies",
+        code: "DMS",
+        programme: "Military Training, Tactics & Strategic Leadership Structures",
         courses: [
-          { id: 121, code: "BST1113", title: "Cell Biology & Genetics", year: 1 },
-          { id: 122, code: "BST1122", title: "Biochemistry & Biomolecules", year: 1 },
-          { id: 123, code: "BST1213", title: "Microbiology & Immunology", year: 1 },
-          { id: 124, code: "BST1223", title: "Bioinformatics & Computational Biology", year: 2 },
-          { id: 125, code: "BST2113", title: "Bioprocess Technology", year: 2 },
-          { id: 126, code: "BST2123", title: "Molecular Biology Techniques", year: 2 },
-          { id: 127, code: "BST2213", title: "Agricultural Biotechnology & Food Security", year: 2 }
-        ]
-      },
-      {
-        id: 3,
-        name: "Department of Engineering Technology",
-        code: "DET",
-        programme: "Bachelor of Engineering Technology Honours (Construction / Building Services / Biomedical)",
-        courses: [
-          { id: 131, code: "BET1113", title: "Engineering Mathematics", year: 1 },
-          { id: 132, code: "BET1123", title: "Fundamentals of Electrical & Electronics", year: 1 },
-          { id: 133, code: "BET1213", title: "Engineering Mechanics & Statics", year: 1 },
-          { id: 134, code: "BET1223", title: "Civil Engineering Materials & Surveying", year: 1 },
-          { id: 135, code: "BET2113", title: "Biomedical Instrumentation & Sensors", year: 2 },
-          { id: 136, code: "BET2123", title: "Building Services & HVAC Systems", year: 2 },
-          { id: 137, code: "BET2213", title: "Construction Technology & Project Management", year: 2 }
+          { id: 804, code: "DMS1012", title: "Military Leadership & Command Structures", year: 1 },
+          { id: 805, code: "DMS2013", title: "Defence Management & Tactical Operations", year: 2 }
         ]
       }
     ]
   },
   {
     id: 2,
+    name: "Faculty of Medicine",
+    code: "FOM",
+    departments: [
+      {
+        id: 3,
+        name: "Department of Anatomy",
+        code: "DAN",
+        programme: "Bachelor of Medicine, Bachelor of Surgery (MBBS)",
+        courses: [
+          { id: 811, code: "AN1013", title: "Gross Anatomy & Embryology", year: 1 },
+          { id: 812, code: "AN1023", title: "Neuroanatomy & Histology", year: 1 }
+        ]
+      },
+      {
+        id: 4,
+        name: "Department of Physiology",
+        code: "DPHS",
+        programme: "MBBS - Human Physiology & Biophysics",
+        courses: [
+          { id: 813, code: "PH1013", title: "Cellular & Neurophysiology", year: 1 },
+          { id: 814, code: "PH1023", title: "Cardiovascular & Respiratory Physiology", year: 1 }
+        ]
+      },
+      {
+        id: 5,
+        name: "Department of Biochemistry",
+        code: "DBC",
+        programme: "MBBS - Medical Biochemistry & Molecular Genetics",
+        courses: [
+          { id: 815, code: "BC1013", title: "Medical Biochemistry & Enzymology", year: 1 },
+          { id: 816, code: "BC1023", title: "Metabolic Pathways & Human Genetics", year: 1 }
+        ]
+      },
+      {
+        id: 6,
+        name: "Department of Pathology",
+        code: "DPTH",
+        programme: "MBBS - General & Systemic Pathology",
+        courses: [
+          { id: 817, code: "PA2013", title: "General Pathology & Pathophysiology", year: 2 },
+          { id: 818, code: "PA2023", title: "Systemic Pathology & Haematology", year: 2 }
+        ]
+      },
+      {
+        id: 7,
+        name: "Department of Microbiology",
+        code: "DMCB",
+        programme: "MBBS - Medical Microbiology & Immunology",
+        courses: [
+          { id: 819, code: "MC2013", title: "Medical Bacteriology & Virology", year: 2 },
+          { id: 820, code: "MC2023", title: "Immunology & Infectious Diseases", year: 2 }
+        ]
+      },
+      {
+        id: 8,
+        name: "Department of Pharmacology",
+        code: "DPHM",
+        programme: "MBBS - Pharmacology & Pharmacotherapeutics",
+        courses: [
+          { id: 821, code: "PM2013", title: "General Principles of Pharmacology", year: 2 },
+          { id: 822, code: "PM2023", title: "Clinical Pharmacotherapeutics", year: 2 }
+        ]
+      },
+      {
+        id: 9,
+        name: "Department of Forensic Medicine",
+        code: "DFM",
+        programme: "MBBS - Forensic Medicine & Toxicology",
+        courses: [
+          { id: 823, code: "FM3013", title: "Forensic Medicine & Medical Jurisprudence", year: 3 },
+          { id: 824, code: "FM3023", title: "Clinical Forensic Toxicology", year: 3 }
+        ]
+      },
+      {
+        id: 10,
+        name: "Department of Public Health and Family Medicine",
+        code: "DPHFM",
+        programme: "MBBS - Community Medicine & Public Health",
+        courses: [
+          { id: 825, code: "PH3013", title: "Epidemiology & Community Health", year: 3 },
+          { id: 826, code: "PH3023", title: "Family Medicine & Primary Healthcare", year: 3 }
+        ]
+      },
+      {
+        id: 11,
+        name: "Department of Clinical Medicine",
+        code: "DCMED",
+        programme: "MBBS - Internal Medicine & Therapeutics",
+        courses: [
+          { id: 827, code: "CM4013", title: "Internal Medicine & Diagnostics", year: 4 },
+          { id: 828, code: "CM4023", title: "Emergency & Critical Care Medicine", year: 4 }
+        ]
+      },
+      {
+        id: 12,
+        name: "Department of Surgery",
+        code: "DSUR",
+        programme: "MBBS - General Surgery & Operative Techniques",
+        courses: [
+          { id: 829, code: "SU4013", title: "Principles of Surgery & Surgical Pathology", year: 4 },
+          { id: 830, code: "SU4023", title: "Trauma Management & Operative Care", year: 4 }
+        ]
+      },
+      {
+        id: 13,
+        name: "Department of Paediatrics",
+        code: "DPAE",
+        programme: "MBBS - Paediatric Medicine & Child Health",
+        courses: [
+          { id: 831, code: "PD4013", title: "Paediatric Medicine & Child Development", year: 4 },
+          { id: 832, code: "PD4023", title: "Neonatology & Paediatric Emergencies", year: 4 }
+        ]
+      },
+      {
+        id: 14,
+        name: "Department of Obstetrics and Gynaecology",
+        code: "DOBG",
+        programme: "MBBS - Obstetrics & Gynaecological Health",
+        courses: [
+          { id: 833, code: "OG4013", title: "Obstetric Care & Maternal Health", year: 4 },
+          { id: 834, code: "OG4023", title: "Gynaecological Oncology & Endocrinology", year: 4 }
+        ]
+      },
+      {
+        id: 15,
+        name: "Department of Psychiatry",
+        code: "DPSY",
+        programme: "MBBS - Clinical Psychiatry & Behavioural Sciences",
+        courses: [
+          { id: 835, code: "PS4013", title: "Clinical Psychiatry & Psychopathology", year: 4 },
+          { id: 836, code: "PS4023", title: "Behavioural Sciences & Psychotherapy", year: 4 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 3,
+    name: "Faculty of Engineering",
+    code: "FOE",
+    departments: [
+      {
+        id: 16,
+        name: "Department of Aeronautical Engineering",
+        code: "DAE",
+        programme: "BSc (Hons) in Aeronautical Engineering / Aircraft Maintenance Eng",
+        courses: [
+          { id: 361, code: "AE1013", title: "Introduction to Aeronautics & Flight Mechanics", year: 1 },
+          { id: 362, code: "AE2013", title: "Aircraft Aerodynamics & Computational Fluid Dynamics", year: 2 },
+          { id: 363, code: "AE2023", title: "Aircraft Propulsion & Gas Turbine Engines", year: 2 },
+          { id: 364, code: "AE2033", title: "Aircraft Structures & Material Science", year: 2 }
+        ]
+      },
+      {
+        id: 17,
+        name: "Department of Civil Engineering",
+        code: "DCV",
+        programme: "BSc (Hons) in Civil Engineering",
+        courses: [
+          { id: 301, code: "CV1013", title: "Engineering Geology & Soil Mechanics", year: 1 },
+          { id: 302, code: "CV2013", title: "Mechanics of Fluids & Hydraulics", year: 2 },
+          { id: 303, code: "CV2023", title: "Structural Analysis I", year: 2 },
+          { id: 304, code: "CV2033", title: "Surveying & Geomatics", year: 2 }
+        ]
+      },
+      {
+        id: 18,
+        name: "Department of Electrical and Electronic Engineering",
+        code: "DEEE",
+        programme: "BSc (Hons) in Electrical & Electronic / Telecommunication / Biomedical Eng",
+        courses: [
+          { id: 341, code: "EE1013", title: "Circuit Theory & Network Analysis", year: 1 },
+          { id: 342, code: "EE1023", title: "Analog Electronic Circuits", year: 1 },
+          { id: 343, code: "TE2013", title: "Digital Communication Engineering", year: 2 },
+          { id: 344, code: "TE2023", title: "Electromagnetic Waves & Transmission Lines", year: 2 },
+          { id: 345, code: "BM2013", title: "Biomedical Instrumentation & Physiological Modeling", year: 2 }
+        ]
+      },
+      {
+        id: 19,
+        name: "Department of Mechanical Engineering",
+        code: "DME",
+        programme: "BSc (Hons) in Mechanical Engineering / Mechatronic Engineering",
+        courses: [
+          { id: 321, code: "ME1013", title: "Engineering Thermodynamics", year: 1 },
+          { id: 322, code: "ME1023", title: "Fluid Mechanics & Machinery", year: 1 },
+          { id: 323, code: "ME2013", title: "Mechanics of Machines & Vibration", year: 2 },
+          { id: 324, code: "MC2013", title: "Sensors & Actuators in Mechatronics", year: 2 },
+          { id: 325, code: "MC2023", title: "Robotics & Industrial Automation", year: 2 }
+        ]
+      },
+      {
+        id: 20,
+        name: "Department of Marine Engineering",
+        code: "DMR",
+        programme: "BSc (Hons) in Marine Engineering / Naval Architecture",
+        courses: [
+          { id: 381, code: "MR1013", title: "Marine Engineering Knowledge", year: 1 },
+          { id: 382, code: "NA2013", title: "Naval Architecture & Ship Stability", year: 2 },
+          { id: 383, code: "MR2023", title: "Marine Auxiliary Machinery & Systems", year: 2 }
+        ]
+      },
+      {
+        id: 21,
+        name: "Department of Mathematics",
+        code: "DMA",
+        programme: "Engineering Mathematics & Analytical Methods",
+        courses: [
+          { id: 391, code: "MA1013", title: "Engineering Mathematics I", year: 1 },
+          { id: 392, code: "MA1023", title: "Engineering Mathematics II (Calculus & Linear Algebra)", year: 1 },
+          { id: 393, code: "MA2013", title: "Differential Equations & Numerical Methods", year: 2 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 4,
     name: "Faculty of Computing",
     code: "FOC",
     departments: [
       {
-        id: 4,
+        id: 22,
         name: "Department of Computer Science",
         code: "DCS",
         programme: "BSc (Hons) in Computer Science / BSc (Hons) in Software Engineering",
@@ -114,7 +299,7 @@ const KDU_CATALOG = [
         ]
       },
       {
-        id: 5,
+        id: 23,
         name: "Department of Information Technology",
         code: "DIT",
         programme: "BSc (Hons) in Information Technology / BSc (Hons) in Information Systems",
@@ -129,7 +314,7 @@ const KDU_CATALOG = [
         ]
       },
       {
-        id: 6,
+        id: 24,
         name: "Department of Computer Engineering",
         code: "DCE",
         programme: "BSc (Hons) in Computer Engineering",
@@ -141,7 +326,7 @@ const KDU_CATALOG = [
         ]
       },
       {
-        id: 7,
+        id: 25,
         name: "Department of Computational Mathematics",
         code: "DCM",
         programme: "Computational Mathematics & Statistical Computing",
@@ -154,92 +339,13 @@ const KDU_CATALOG = [
     ]
   },
   {
-    id: 3,
-    name: "Faculty of Engineering",
-    code: "FOE",
-    departments: [
-      {
-        id: 8,
-        name: "Department of Civil Engineering",
-        code: "DCV",
-        programme: "BSc (Hons) in Civil Engineering",
-        courses: [
-          { id: 301, code: "CV1013", title: "Engineering Geology & Soil Mechanics", year: 1 },
-          { id: 302, code: "CV2013", title: "Mechanics of Fluids & Hydraulics", year: 2 },
-          { id: 303, code: "CV2023", title: "Structural Analysis I", year: 2 },
-          { id: 304, code: "CV2033", title: "Surveying & Geomatics", year: 2 }
-        ]
-      },
-      {
-        id: 9,
-        name: "Department of Mechanical Engineering",
-        code: "DME",
-        programme: "BSc (Hons) in Mechanical Engineering / Mechatronic Engineering",
-        courses: [
-          { id: 321, code: "ME1013", title: "Engineering Thermodynamics", year: 1 },
-          { id: 322, code: "ME1023", title: "Fluid Mechanics & Machinery", year: 1 },
-          { id: 323, code: "ME2013", title: "Mechanics of Machines & Vibration", year: 2 },
-          { id: 324, code: "MC2013", title: "Sensors & Actuators in Mechatronics", year: 2 },
-          { id: 325, code: "MC2023", title: "Robotics & Industrial Automation", year: 2 }
-        ]
-      },
-      {
-        id: 10,
-        name: "Department of Electrical, Electronic and Telecommunication Engineering",
-        code: "DEET",
-        programme: "BSc (Hons) in Electrical & Electronic / Telecommunication / Biomedical Eng",
-        courses: [
-          { id: 341, code: "EE1013", title: "Circuit Theory & Network Analysis", year: 1 },
-          { id: 342, code: "EE1023", title: "Analog Electronic Circuits", year: 1 },
-          { id: 343, code: "TE2013", title: "Digital Communication Engineering", year: 2 },
-          { id: 344, code: "TE2023", title: "Electromagnetic Waves & Transmission Lines", year: 2 },
-          { id: 345, code: "BM2013", title: "Biomedical Instrumentation & Physiological Modeling", year: 2 }
-        ]
-      },
-      {
-        id: 11,
-        name: "Department of Aeronautical Engineering",
-        code: "DAE",
-        programme: "BSc (Hons) in Aeronautical Engineering / Aircraft Maintenance Eng",
-        courses: [
-          { id: 361, code: "AE1013", title: "Introduction to Aeronautics & Flight Mechanics", year: 1 },
-          { id: 362, code: "AE2013", title: "Aircraft Aerodynamics & Computational Fluid Dynamics", year: 2 },
-          { id: 363, code: "AE2023", title: "Aircraft Propulsion & Gas Turbine Engines", year: 2 },
-          { id: 364, code: "AE2033", title: "Aircraft Structures & Material Science", year: 2 }
-        ]
-      },
-      {
-        id: 12,
-        name: "Department of Marine Engineering",
-        code: "DMR",
-        programme: "BSc (Hons) in Marine Engineering / Naval Architecture",
-        courses: [
-          { id: 381, code: "MR1013", title: "Marine Engineering Knowledge", year: 1 },
-          { id: 382, code: "NA2013", title: "Naval Architecture & Ship Stability", year: 2 },
-          { id: 383, code: "MR2023", title: "Marine Auxiliary Machinery & Systems", year: 2 }
-        ]
-      },
-      {
-        id: 13,
-        name: "Department of Mathematics",
-        code: "DMA",
-        programme: "Engineering Mathematics & Analytical Methods",
-        courses: [
-          { id: 391, code: "MA1013", title: "Engineering Mathematics I", year: 1 },
-          { id: 392, code: "MA1023", title: "Engineering Mathematics II (Calculus & Linear Algebra)", year: 1 },
-          { id: 393, code: "MA2013", title: "Differential Equations & Numerical Methods", year: 2 }
-        ]
-      }
-    ]
-  },
-  {
-    id: 4,
-    name: "Faculty of Management, Social Sciences & Humanities",
+    id: 5,
+    name: "Faculty of Management, Social Sciences and Humanities",
     code: "FMSH",
     departments: [
       {
-        id: 14,
-        name: "Department of Management & Finance",
+        id: 26,
+        name: "Department of Management and Finance",
         code: "DMF",
         programme: "BSc Logistics Management (Hons) / Management & Technical Sciences / Business Analytics",
         courses: [
@@ -251,7 +357,7 @@ const KDU_CATALOG = [
         ]
       },
       {
-        id: 15,
+        id: 27,
         name: "Department of Social Sciences",
         code: "DSS",
         programme: "BSc in Social Sciences",
@@ -262,7 +368,7 @@ const KDU_CATALOG = [
         ]
       },
       {
-        id: 16,
+        id: 28,
         name: "Department of Languages",
         code: "DLG",
         programme: "BA in Teaching English to Speakers of Other Languages (TESOL) / Applied Communication",
@@ -275,13 +381,51 @@ const KDU_CATALOG = [
     ]
   },
   {
-    id: 5,
+    id: 6,
+    name: "Faculty of Law",
+    code: "FOL",
+    departments: [
+      {
+        id: 29,
+        name: "Department of Public Law",
+        code: "DPL",
+        programme: "Bachelor of Laws Honours (LLB) - Public Law & Governance",
+        courses: [
+          { id: 602, code: "LAW1023", title: "Constitutional & Administrative Law", year: 1 },
+          { id: 603, code: "LAW2013", title: "Criminal Law & Penal Code Procedure", year: 2 }
+        ]
+      },
+      {
+        id: 30,
+        name: "Department of Private Law",
+        code: "DPRL",
+        programme: "Bachelor of Laws Honours (LLB) - Private & Commercial Law",
+        courses: [
+          { id: 601, code: "LAW1013", title: "Legal System of Sri Lanka", year: 1 },
+          { id: 604, code: "LAW2023", title: "Law of Contracts & Commercial Obligations", year: 2 },
+          { id: 606, code: "LAW3023", title: "Law of Property & Delict", year: 3 }
+        ]
+      },
+      {
+        id: 31,
+        name: "Department of International Law",
+        code: "DIL",
+        programme: "Bachelor of Laws Honours (LLB) - International & Human Rights Law",
+        courses: [
+          { id: 605, code: "LAW3013", title: "Public International Law & Human Rights", year: 3 },
+          { id: 607, code: "LAW3033", title: "International Humanitarian Law & Armed Conflict", year: 3 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 7,
     name: "Faculty of Allied Health Sciences",
     code: "FAHS",
     departments: [
       {
-        id: 17,
-        name: "Department of Nursing & Midwifery",
+        id: 32,
+        name: "Department of Nursing and Midwifery",
         code: "DNM",
         programme: "BSc (Hons) in Nursing",
         courses: [
@@ -291,7 +435,27 @@ const KDU_CATALOG = [
         ]
       },
       {
-        id: 18,
+        id: 33,
+        name: "Department of Physiotherapy",
+        code: "DPT",
+        programme: "BSc (Hons) in Physiotherapy",
+        courses: [
+          { id: 561, code: "PHT1013", title: "Biomechanics & Human Kinesiology", year: 1 },
+          { id: 562, code: "PHT1023", title: "Musculoskeletal Rehabilitation", year: 2 }
+        ]
+      },
+      {
+        id: 34,
+        name: "Department of Pharmacy",
+        code: "DPH",
+        programme: "Bachelor of Pharmacy Honours (BPharm)",
+        courses: [
+          { id: 541, code: "PHA1013", title: "Pharmaceutics I", year: 1 },
+          { id: 542, code: "PHA1023", title: "Pharmacology & Pharmacokinetics", year: 2 }
+        ]
+      },
+      {
+        id: 35,
         name: "Department of Medical Laboratory Sciences",
         code: "DMLS",
         programme: "BSc (Hons) in Medical Laboratory Sciences",
@@ -302,27 +466,7 @@ const KDU_CATALOG = [
         ]
       },
       {
-        id: 19,
-        name: "Department of Pharmacy",
-        code: "DPH",
-        programme: "Bachelor of Pharmacy Honours (BPharm)",
-        courses: [
-          { id: 541, code: "PHA1013", title: "Pharmaceutics I", year: 1 },
-          { id: 542, code: "PHA1023", title: "Pharmacology & Pharmacokinetics", year: 2 }
-        ]
-      },
-      {
-        id: 20,
-        name: "Department of Physiotherapy and Occupational Therapy",
-        code: "DPT",
-        programme: "BSc (Hons) in Physiotherapy",
-        courses: [
-          { id: 561, code: "PHT1013", title: "Biomechanics & Human Kinesiology", year: 1 },
-          { id: 562, code: "PHT1023", title: "Musculoskeletal Rehabilitation", year: 2 }
-        ]
-      },
-      {
-        id: 21,
+        id: 36,
         name: "Department of Radiography and Radiotherapy",
         code: "DRR",
         programme: "BSc (Hons) in Radiography / Radiotherapy",
@@ -334,32 +478,12 @@ const KDU_CATALOG = [
     ]
   },
   {
-    id: 6,
-    name: "Faculty of Law",
-    code: "FOL",
-    departments: [
-      {
-        id: 22,
-        name: "Department of Law",
-        code: "DLAW",
-        programme: "Bachelor of Laws Honours (LLB)",
-        courses: [
-          { id: 601, code: "LAW1013", title: "Legal System of Sri Lanka", year: 1 },
-          { id: 602, code: "LAW1023", title: "Constitutional & Administrative Law", year: 1 },
-          { id: 603, code: "LAW2013", title: "Criminal Law & Penal Code Procedure", year: 2 },
-          { id: 604, code: "LAW2023", title: "Law of Contracts & Commercial Obligations", year: 2 },
-          { id: 605, code: "LAW3013", title: "Public International Law & Human Rights", year: 3 }
-        ]
-      }
-    ]
-  },
-  {
-    id: 7,
-    name: "Faculty of Built Environment & Spatial Sciences",
+    id: 8,
+    name: "Faculty of Built Environment and Spatial Sciences",
     code: "FBESS",
     departments: [
       {
-        id: 23,
+        id: 37,
         name: "Department of Architecture",
         code: "DARC",
         programme: "Bachelor of Architecture Honours (BArch)",
@@ -369,7 +493,17 @@ const KDU_CATALOG = [
         ]
       },
       {
-        id: 24,
+        id: 38,
+        name: "Department of Quantity Surveying",
+        code: "DQS",
+        programme: "BSc (Hons) in Quantity Surveying",
+        courses: [
+          { id: 741, code: "QS1013", title: "Measurement of Building Works", year: 1 },
+          { id: 742, code: "QS2013", title: "Construction Economics & Cost Estimating", year: 2 }
+        ]
+      },
+      {
+        id: 39,
         name: "Department of Spatial Sciences",
         code: "DSPS",
         programme: "BSc (Hons) in Surveying Sciences / Cartography & GIS",
@@ -377,15 +511,120 @@ const KDU_CATALOG = [
           { id: 721, code: "SPS1013", title: "Geodesy & Land Surveying Principles", year: 1 },
           { id: 722, code: "SPS2013", title: "Geographic Information Systems (GIS) & Remote Sensing", year: 2 }
         ]
+      }
+    ]
+  },
+  {
+    id: 9,
+    name: "Faculty of Technology",
+    code: "FOT",
+    departments: [
+      {
+        id: 40,
+        name: "Department of Engineering Technology",
+        code: "DET",
+        programme: "Bachelor of Engineering Technology Honours (Construction / Building Services / Biomedical)",
+        courses: [
+          { id: 131, code: "BET1113", title: "Engineering Mathematics", year: 1 },
+          { id: 132, code: "BET1123", title: "Fundamentals of Electrical & Electronics", year: 1 },
+          { id: 133, code: "BET1213", title: "Engineering Mechanics & Statics", year: 1 },
+          { id: 134, code: "BET1223", title: "Civil Engineering Materials & Surveying", year: 1 },
+          { id: 135, code: "BET2113", title: "Biomedical Instrumentation & Sensors", year: 2 },
+          { id: 136, code: "BET2123", title: "Building Services & HVAC Systems", year: 2 },
+          { id: 137, code: "BET2213", title: "Construction Technology & Project Management", year: 2 }
+        ]
       },
       {
-        id: 25,
-        name: "Department of Quantity Surveying",
-        code: "DQS",
-        programme: "BSc (Hons) in Quantity Surveying",
+        id: 41,
+        name: "Department of Biosystems Technology",
+        code: "DBST",
+        programme: "Bachelor of Biosystems Technology Honours (BBST Hons) / Bachelor of Technology Honours in ICT (BTech Hons in ICT)",
         courses: [
-          { id: 741, code: "QS1013", title: "Measurement of Building Works", year: 1 },
-          { id: 742, code: "QS2013", title: "Construction Economics & Cost Estimating", year: 2 }
+          { id: 121, code: "BST1113", title: "Cell Biology & Genetics", year: 1 },
+          { id: 122, code: "BST1122", title: "Biochemistry & Biomolecules", year: 1 },
+          { id: 123, code: "BST1213", title: "Microbiology & Immunology", year: 1 },
+          { id: 124, code: "BST1223", title: "Bioinformatics & Computational Biology", year: 2 },
+          { id: 125, code: "BST2113", title: "Bioprocess Technology", year: 2 },
+          { id: 126, code: "BST2123", title: "Molecular Biology Techniques", year: 2 },
+          { id: 127, code: "BST2213", title: "Agricultural Biotechnology & Food Security", year: 2 },
+          { id: 101, code: "ICT1113", title: "Fundamentals of Programming", year: 1 },
+          { id: 102, code: "ICT1123", title: "Computer Systems & Architecture", year: 1 },
+          { id: 103, code: "ICT1133", title: "Mathematics for Technology", year: 1 },
+          { id: 104, code: "ICT1213", title: "Object Oriented Programming", year: 1 },
+          { id: 105, code: "ICT1223", title: "Data Structures & Algorithms", year: 1 },
+          { id: 106, code: "ICT1233", title: "Database Management Systems", year: 1 },
+          { id: 107, code: "ICT2113", title: "Web Technologies & Applications", year: 2 },
+          { id: 108, code: "ICT2123", title: "Computer Networks & Data Communications", year: 2 },
+          { id: 109, code: "ICT2133", title: "Operating Systems & Linux Administration", year: 2 },
+          { id: 110, code: "ICT2213", title: "Software Engineering Principles", year: 2 },
+          { id: 111, code: "ICT2223", title: "Mobile Application Development", year: 2 },
+          { id: 112, code: "ICT2282", title: "Skill Development Project II (SDP II)", year: 2 },
+          { id: 113, code: "EN1022", title: "Professional English for Technology", year: 2 },
+          { id: 114, code: "DL1012", title: "Military Studies & Leadership", year: 2 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 10,
+    name: "Faculty of Criminal Justice",
+    code: "FCJ",
+    departments: [
+      {
+        id: 42,
+        name: "Department of Criminology and Criminal Justice",
+        code: "DCCJ",
+        programme: "BSc in Criminology & Criminal Justice",
+        courses: [
+          { id: 851, code: "CJ1013", title: "Introduction to Criminology & Criminal Justice", year: 1 },
+          { id: 852, code: "CJ2013", title: "Forensic Psychology & Criminal Behaviour", year: 2 },
+          { id: 853, code: "CJ3013", title: "Penology & Correctional Administration", year: 3 }
+        ]
+      },
+      {
+        id: 43,
+        name: "Department of Law Enforcement",
+        code: "DLE",
+        programme: "BSc in Law Enforcement & Police Science",
+        courses: [
+          { id: 854, code: "LE1013", title: "Principles of Law Enforcement & Police Systems", year: 1 },
+          { id: 855, code: "LE2013", title: "Criminal Investigation & Crime Scene Management", year: 2 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 11,
+    name: "Faculty of Industrial Studies",
+    code: "FIS",
+    departments: [
+      {
+        id: 44,
+        name: "Department of Industrial Studies",
+        code: "DIS",
+        programme: "Bachelor of Industrial Studies (Southern Campus - Technical, Manufacturing & Industrial Studies)",
+        courses: [
+          { id: 861, code: "IND1013", title: "Manufacturing Technology & Industrial Operations", year: 1 },
+          { id: 862, code: "IND2013", title: "Quality Assurance & Total Quality Management", year: 2 },
+          { id: 863, code: "IND3013", title: "Supply Chain Analytics & Lean Manufacturing", year: 3 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 12,
+    name: "Faculty of Graduate Studies",
+    code: "FGS",
+    departments: [
+      {
+        id: 45,
+        name: "Department of Graduate Studies",
+        code: "DGS",
+        programme: "Postgraduate Education, Executive Diplomas & Master's Degree Programmes",
+        courses: [
+          { id: 871, code: "FGS8013", title: "Advanced Research Methodology & Academic Writing", year: 1 },
+          { id: 872, code: "FGS8023", title: "Strategic Leadership & Public Governance", year: 1 },
+          { id: 873, code: "FGS8033", title: "Project Management & Quantitative Data Analysis", year: 2 }
         ]
       }
     ]
@@ -464,8 +703,8 @@ function getInitialSeedState() {
         indexNo: "D/ICT/26/0010",
         avatarUrl: "img/avatars/student-male-1.svg",
         role: "student",
-        facultyId: 1, // Faculty of Technology
-        departmentId: 1, // Department of Information and Communication Technology
+        facultyId: 9, // Faculty of Technology
+        departmentId: 41, // Department of Biosystems Technology (conducting BTech Hons in ICT)
         intake: "43",
         year: 2,
         bio: "BT (Hons) in ICT, Intake 43 (Group 10). Lead system architecture & algorithm implementation.",
@@ -479,8 +718,8 @@ function getInitialSeedState() {
         indexNo: "D/ICT/26/0028",
         avatarUrl: "img/avatars/student-female-1.svg",
         role: "student",
-        facultyId: 1,
-        departmentId: 1,
+        facultyId: 9,
+        departmentId: 41,
         intake: "43",
         year: 2,
         bio: "BT (Hons) in ICT, Intake 43 (Group 10). Focus on relational database schema and discrete mathematics.",
@@ -494,8 +733,8 @@ function getInitialSeedState() {
         indexNo: "D/ICT/26/0042",
         avatarUrl: "img/avatars/student-male-2.svg",
         role: "student",
-        facultyId: 1,
-        departmentId: 1,
+        facultyId: 9,
+        departmentId: 41,
         intake: "43",
         year: 2,
         bio: "BT (Hons) in ICT, Intake 43 (Group 10). Specializing in computer networking and system administration.",
@@ -509,8 +748,8 @@ function getInitialSeedState() {
         indexNo: "D/ICT/26/0059",
         avatarUrl: "img/avatars/student-male-1.svg",
         role: "student",
-        facultyId: 1,
-        departmentId: 1,
+        facultyId: 9,
+        departmentId: 41,
         intake: "43",
         year: 2,
         bio: "BT (Hons) in ICT, Intake 43 (Group 10). Mobile application development and software engineering.",
@@ -524,8 +763,8 @@ function getInitialSeedState() {
         indexNo: "D/ICT/26/0062",
         avatarUrl: "img/avatars/student-female-2.svg",
         role: "student",
-        facultyId: 1,
-        departmentId: 1,
+        facultyId: 9,
+        departmentId: 41,
         intake: "43",
         year: 2,
         bio: "BT (Hons) in ICT, Intake 43 (Group 10). UI/UX design, web architecture, and cloud platforms.",
@@ -539,8 +778,8 @@ function getInitialSeedState() {
         indexNo: "C/ICT/26/0045",
         avatarUrl: "img/avatars/cadet-male.svg",
         role: "student",
-        facultyId: 1,
-        departmentId: 1,
+        facultyId: 9,
+        departmentId: 41,
         intake: "43",
         year: 2,
         bio: "Officer Cadet, Intake 43. Algorithms & data structures peer study tutor.",
@@ -554,8 +793,8 @@ function getInitialSeedState() {
         indexNo: "STAFF/FOT/01",
         avatarUrl: "img/avatars/officer-staff.svg",
         role: "admin",
-        facultyId: 1,
-        departmentId: 1,
+        facultyId: 9,
+        departmentId: 41,
         intake: "43",
         year: 4,
         bio: "Academic Coordinator & Moderation Officer, Faculty of Technology.",
@@ -643,14 +882,18 @@ function getInitialSeedState() {
   };
 }
 
-const STORAGE_KEY = "kdu_studyconnect_clean_v1";
+const STORAGE_KEY = "kdu_studyconnect_clean_v2";
 
 let state = null;
 let sbClient = null;
 
 function loadStateFromStorage() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      const legacyRaw = localStorage.getItem("kdu_studyconnect_clean_v1");
+      if (legacyRaw) raw = legacyRaw;
+    }
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && Array.isArray(parsed.users)) {
@@ -667,6 +910,11 @@ function loadStateFromStorage() {
           if (!parsed.sessions || parsed.sessions.length === 0) parsed.sessions = freshSeed.sessions;
         } else {
           parsed.users.forEach(function (u) {
+            // Auto-migrate legacy faculty/department IDs from v1
+            if (u.facultyId === 1 && (!u.departmentId || u.departmentId === 1 || u.departmentId === 42)) {
+              u.facultyId = 9;
+              u.departmentId = 41;
+            }
             const cached = getCachedAvatar(u.id) || getCachedAvatar(u.email);
             if (cached) {
               u.avatarUrl = cached;
@@ -1254,8 +1502,8 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
     indexNo: cleanIndex,
     avatarUrl: defaultAvatar,
     role: isAdminEmail(cleanEmail) || cleanIndex.startsWith("STAFF") ? "admin" : "student",
-    facultyId: Number(facultyId) || 1,
-    departmentId: Number(departmentId) || 1,
+    facultyId: Number(facultyId) || 9,
+    departmentId: Number(departmentId) || (facultyById(Number(facultyId) || 9)?.departments?.[0]?.id || 41),
     intake: String(intake || "43"),
     year: 2,
     bio: "",

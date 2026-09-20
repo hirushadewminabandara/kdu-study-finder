@@ -397,7 +397,7 @@ function initAuthPage() {
       const name = ($("#reg-fullname")?.value || "").trim();
       const indexNo = ($("#reg-index")?.value || "").trim();
       const intake = $("#reg-intake")?.value || "43";
-      const facultyId = $("#reg-faculty")?.value || "1";
+      const facultyId = $("#reg-faculty")?.value || "9";
       const email = ($("#reg-email")?.value || "").trim();
       const password = ($("#reg-password")?.value || "").trim();
 
@@ -413,7 +413,7 @@ function initAuthPage() {
 
       registerBtn.disabled = true;
       registerBtn.textContent = "Verifying & Creating...";
-      const err = await signUp(name, indexNo, email, password, facultyId, 1, intake);
+      const err = await signUp(name, indexNo, email, password, facultyId, null, intake);
       registerBtn.disabled = false;
       registerBtn.textContent = "Verify & Register Identity";
       if (err) {
