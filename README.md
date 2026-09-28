@@ -25,7 +25,7 @@ A collaborative study group and peer finder web application designed specificall
 | **D/ICT/26/0059** | **D.G.K.N. Dahanayaka** | Day Scholar | Frontend Layouts, Responsive UI & Cross-Device Compatibility |
 | **D/ICT/26/0062** | **K.V.H. Nemanthi** | Day Scholar | UI/UX Design System, Component Styling & Asset Design |
 
-* **Faculty Academic Moderator:** Maj. S. Jayawardena (`STAFF/FOT/01`)
+
 
 ---
 
