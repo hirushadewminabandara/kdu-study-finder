@@ -1435,6 +1435,11 @@ async function signIn(email, password) {
     return "Access restricted: Only official university accounts ending with @kdu.ac.lk are permitted.";
   }
 
+  // Validate minimum password length
+  if (password.length < 6) {
+    return "Password must be at least 6 characters in length.";
+  }
+
   // 1. If Supabase configured, attempt live auth
   if (sbClient) {
     try {
@@ -1495,6 +1500,11 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
   // Enforce @kdu.ac.lk restriction
   if (!cleanEmail.endsWith("@kdu.ac.lk")) {
     return "Access restricted: Registration is exclusively permitted for university accounts ending with @kdu.ac.lk.";
+  }
+
+  // Validate minimum password length
+  if (password.length < 6) {
+    return "Password must be at least 6 characters in length.";
   }
 
   // Validate index prefix

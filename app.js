@@ -360,6 +360,66 @@ function initAuthPage() {
     });
   }
 
+  // Password Visibility Toggle Utility
+  function setupPasswordToggle(inputId, toggleBtnId) {
+    const input = $(inputId);
+    const btn = $(toggleBtnId);
+    if (!input || !btn) return;
+    btn.addEventListener("click", function () {
+      const isPassword = input.type === "password";
+      input.type = isPassword ? "text" : "password";
+      const icon = btn.querySelector(".material-symbols-outlined");
+      if (icon) {
+        icon.textContent = isPassword ? "visibility_off" : "visibility";
+      }
+      btn.title = isPassword ? "Hide password" : "Show password";
+      input.focus();
+    });
+  }
+  setupPasswordToggle("#signin-password", "#btn-toggle-signin-password");
+  setupPasswordToggle("#reg-password", "#btn-toggle-reg-password");
+  setupPasswordToggle("#reg-confirm-password", "#btn-toggle-reg-confirm-password");
+
+  // Real-time Registration Password Check & Confirmation
+  const regPassInput = $("#reg-password");
+  const regConfirmPassInput = $("#reg-confirm-password");
+  const strengthHint = $("#reg-password-strength-hint");
+  const matchHint = $("#reg-password-match-hint");
+
+  function validateRegisterPasswordHints() {
+    const p1 = regPassInput ? regPassInput.value : "";
+    const p2 = regConfirmPassInput ? regConfirmPassInput.value : "";
+
+    if (strengthHint) {
+      if (p1.length > 0 && p1.length < 6) {
+        strengthHint.className = "text-[11px] text-error mt-1 flex items-center gap-1 font-medium";
+        strengthHint.innerHTML = '<span class="material-symbols-outlined text-[14px]">cancel</span><span>Must be at least 6 characters (' + p1.length + '/6)</span>';
+      } else if (p1.length >= 6) {
+        strengthHint.className = "text-[11px] text-green-600 mt-1 flex items-center gap-1 font-medium";
+        strengthHint.innerHTML = '<span class="material-symbols-outlined text-[14px]">check_circle</span><span>Password length requirement met</span>';
+      } else {
+        strengthHint.className = "text-[11px] text-outline mt-1 flex items-center gap-1";
+        strengthHint.innerHTML = '<span class="material-symbols-outlined text-[13px]">info</span><span>Minimum 6 characters</span>';
+      }
+    }
+
+    if (matchHint) {
+      if (!p2) {
+        matchHint.className = "text-[11px] mt-1 hidden flex items-center gap-1";
+        matchHint.innerHTML = "";
+      } else if (p1 === p2) {
+        matchHint.className = "text-[11px] text-green-600 mt-1 flex items-center gap-1 font-medium";
+        matchHint.innerHTML = '<span class="material-symbols-outlined text-[14px]">check_circle</span><span>Passwords match</span>';
+      } else {
+        matchHint.className = "text-[11px] text-error mt-1 flex items-center gap-1 font-medium";
+        matchHint.innerHTML = '<span class="material-symbols-outlined text-[14px]">cancel</span><span>Passwords do not match</span>';
+      }
+    }
+  }
+
+  if (regPassInput) regPassInput.addEventListener("input", validateRegisterPasswordHints);
+  if (regConfirmPassInput) regConfirmPassInput.addEventListener("input", validateRegisterPasswordHints);
+
   // Sign In Action
   const signinBtn = $("#btn-do-signin");
   if (signinBtn) {
@@ -370,6 +430,10 @@ function initAuthPage() {
         showToast("Please enter both university email and password.", true);
         return;
       }
+      if (password.length < 6) {
+        showToast("Password must be at least 6 characters in length.", true);
+        return;
+      }
       if (!email.toLowerCase().endsWith("@kdu.ac.lk")) {
         showToast("Access restricted: Only official accounts ending with @kdu.ac.lk are allowed.", true);
         return;
@@ -378,7 +442,7 @@ function initAuthPage() {
       signinBtn.textContent = "Signing in...";
       const err = await signIn(email, password);
       signinBtn.disabled = false;
-      signinBtn.textContent = "Sign in to Portal";
+      signinBtn.textContent = "Sign In to Portal";
       if (err) {
         showToast(err, true);
       } else {
@@ -402,9 +466,25 @@ function initAuthPage() {
       const facultyId = $("#reg-faculty")?.value || "9";
       const email = ($("#reg-email")?.value || "").trim();
       const password = ($("#reg-password")?.value || "").trim();
+      const confirmPassword = ($("#reg-confirm-password")?.value || "").trim();
 
       if (!name || !indexNo || !email || !password) {
         showToast("All fields are required to register.", true);
+        return;
+      }
+
+      if (password.length < 6) {
+        showToast("Password must be at least 6 characters in length.", true);
+        return;
+      }
+
+      if (!confirmPassword) {
+        showToast("Please confirm your password before submitting.", true);
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showToast("Passwords do not match. Please verify your password.", true);
         return;
       }
 
