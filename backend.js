@@ -1027,7 +1027,7 @@ async function syncFromSupabase() {
 
     // 2. Fetch Remote Groups & Group Members
     const { data: remoteGroups, error: gErr } = await sbClient.from("groups").select("*, group_members(*)");
-    if (!gErr && remoteGroups) {
+    if (!gErr && remoteGroups && remoteGroups.length > 0) {
       state.groups = remoteGroups.map(function (g) {
         const members = (g.group_members || []).map(function (gm) { return gm.student; });
         if (g.created_by && !members.includes(g.created_by)) {
@@ -1050,16 +1050,18 @@ async function syncFromSupabase() {
       .from("messages")
       .select("*")
       .order("sent_at", { ascending: true });
-    if (!mErr && remoteMessages) {
-      state.messages = {};
+    if (!mErr && remoteMessages && remoteMessages.length > 0) {
+      if (!state.messages) state.messages = {};
       remoteMessages.forEach(function (m) {
         if (!state.messages[m.group_id]) state.messages[m.group_id] = [];
-        state.messages[m.group_id].push({
-          id: m.id,
-          sender: m.sender,
-          text: m.content,
-          at: new Date(m.sent_at).getTime()
-        });
+        if (!state.messages[m.group_id].some(function (existing) { return existing.id === m.id; })) {
+          state.messages[m.group_id].push({
+            id: m.id,
+            sender: m.sender,
+            text: m.content,
+            at: new Date(m.sent_at).getTime()
+          });
+        }
       });
     }
 
@@ -1688,6 +1690,10 @@ async function updateUserProfile(id, patch) {
   return null;
 }
 
+function isValidUUID(str) {
+  return typeof str === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+}
+
 async function sendMessage(groupId, senderId, text) {
   if (!groupId || !senderId || !text.trim()) return "Message cannot be empty.";
   const clean = text.trim();
@@ -1699,19 +1705,31 @@ async function sendMessage(groupId, senderId, text) {
     at: Date.now()
   };
 
+  if (!state) db();
   const list = state.messages[groupId] || (state.messages[groupId] = []);
   list.push(msgObj);
   saveStateToStorage();
 
   if (sbClient) {
     try {
-      await sbClient.from("messages").insert({
-        group_id: groupId,
-        sender: senderId,
-        content: clean
-      });
+      // 1. Instant cloud broadcast across tabs & connected clients
+      const ch = sbClient.channel("group-" + groupId);
+      ch.send({
+        type: "broadcast",
+        event: "chat_message",
+        payload: msgObj
+      }).catch(function () {});
+
+      // 2. Persist to Supabase if group and sender are valid UUIDs
+      if (isValidUUID(groupId) && isValidUUID(senderId)) {
+        await sbClient.from("messages").insert({
+          group_id: groupId,
+          sender: senderId,
+          content: clean
+        });
+      }
     } catch (e) {
-      console.warn("Supabase message insert notice:", e);
+      console.warn("Supabase message send notice:", e);
     }
   }
   return null;
@@ -1944,24 +1962,41 @@ async function setGroupOpenStatus(groupId, isOpen) {
 // ---------- Realtime Subscription ----------
 
 function subscribeToMessages(groupId, onMessageReceived) {
+  let sbSub = null;
   if (sbClient) {
     try {
-      return sbClient.channel("group-" + groupId)
+      sbSub = sbClient.channel("group-" + groupId)
         .on("postgres_changes", {
           event: "INSERT",
           schema: "public",
           table: "messages",
           filter: "group_id=eq." + groupId
         }, function (payload) {
-          const list = state.messages[groupId] || (state.messages[groupId] = []);
-          if (!list.some(function (m) { return m.id === payload.new.id; })) {
-            list.push({
-              id: payload.new.id,
-              sender: payload.new.sender,
-              text: payload.new.content,
-              at: new Date(payload.new.sent_at).getTime()
-            });
-            onMessageReceived();
+          if (payload && payload.new) {
+            if (!state) db();
+            const list = state.messages[groupId] || (state.messages[groupId] = []);
+            if (!list.some(function (m) { return m.id === payload.new.id; })) {
+              list.push({
+                id: payload.new.id,
+                sender: payload.new.sender,
+                text: payload.new.content,
+                at: new Date(payload.new.sent_at).getTime()
+              });
+              saveStateToStorage();
+              onMessageReceived();
+            }
+          }
+        })
+        .on("broadcast", { event: "chat_message" }, function (payload) {
+          if (payload && payload.payload) {
+            if (!state) db();
+            const m = payload.payload;
+            const list = state.messages[groupId] || (state.messages[groupId] = []);
+            if (!list.some(function (item) { return item.id === m.id; })) {
+              list.push(m);
+              saveStateToStorage();
+              onMessageReceived();
+            }
           }
         })
         .subscribe();
@@ -1971,11 +2006,20 @@ function subscribeToMessages(groupId, onMessageReceived) {
   }
 
   // Local storage broadcast listener for multi-tab testing
-  window.addEventListener("storage", function (e) {
+  function handleStorage(e) {
     if (e.key === STORAGE_KEY) {
       state = loadStateFromStorage();
       onMessageReceived();
     }
-  });
-  return { unsubscribe: function () {} };
+  }
+  window.addEventListener("storage", handleStorage);
+
+  return {
+    unsubscribe: function () {
+      if (sbSub && sbClient) {
+        try { sbClient.removeChannel(sbSub); } catch (e) {}
+      }
+      window.removeEventListener("storage", handleStorage);
+    }
+  };
 }

@@ -1483,12 +1483,13 @@ function initGroupsPage() {
 
 // ---------- Page Controller: Group Detail & Realtime Chat (group.html) ----------
 
+let groupChatSub = null;
 function initGroupDetailPage() {
   const user = requireLogin();
   if (!user) return;
 
   const params = new URLSearchParams(location.search);
-  const groupId = params.get("id") || "grp-sdp2-syndicate-10";
+  const groupId = params.get("id") || "grp-sdp2-group-10";
   const group = groupById(groupId);
 
   if (!group) {
@@ -1707,7 +1708,10 @@ function initGroupDetailPage() {
   });
 
   // Realtime subscription
-  subscribeToMessages(groupId, function () {
+  if (groupChatSub && typeof groupChatSub.unsubscribe === "function") {
+    groupChatSub.unsubscribe();
+  }
+  groupChatSub = subscribeToMessages(groupId, function () {
     renderChat();
   });
 
