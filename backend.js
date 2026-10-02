@@ -1383,18 +1383,47 @@ async function signInWithGoogle() {
     return "Supabase is not configured. Please paste your SUPABASE_URL and SUPABASE_ANON_KEY into config.js.";
   }
   const redirectUrl = window.location.origin + window.location.pathname;
-  const { data, error } = await sbClient.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: redirectUrl,
-      queryParams: {
-        hd: "kdu.ac.lk", // Restricts Google account selector to @kdu.ac.lk Google Workspace accounts
-        prompt: "select_account"
+  try {
+    const { data, error } = await sbClient.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: redirectUrl,
+        skipBrowserRedirect: true,
+        queryParams: {
+          hd: "kdu.ac.lk", // Restricts Google account selector to @kdu.ac.lk Google Workspace accounts
+          prompt: "select_account"
+        }
       }
+    });
+
+    if (error) return error.message;
+    if (!data || !data.url) return "Failed to generate Google authentication link.";
+
+    // Preflight check: verify provider is enabled before navigating browser
+    const anonKey = typeof getSupabaseAnonKey === "function" ? getSupabaseAnonKey() : (typeof SUPABASE_ANON_KEY !== "undefined" ? SUPABASE_ANON_KEY : "");
+    const probe = await fetch(data.url, {
+      method: "GET",
+      headers: {
+        apikey: anonKey,
+        Authorization: "Bearer " + anonKey
+      }
+    });
+
+    if (!probe.ok) {
+      const errJson = await probe.json().catch(function () { return {}; });
+      if (errJson.msg && errJson.msg.toLowerCase().includes("provider is not enabled")) {
+        return "Google Login is not enabled in your Supabase project yet. Please use the Email & Password form below.";
+      }
+      return errJson.msg || "Google authentication is temporarily unavailable.";
     }
-  });
-  if (error) return error.message;
-  return null;
+
+    // Provider is verified and enabled - redirect to Google SSO
+    window.location.href = data.url;
+    return null;
+  } catch (e) {
+    console.warn("Google OAuth exception:", e);
+    return e.message || "Failed to initiate Google authentication.";
+  }
 }
 
 async function signIn(email, password) {

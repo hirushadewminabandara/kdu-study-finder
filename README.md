@@ -264,6 +264,15 @@ kdu-study-finder/
      2. Run `supabase-schema.sql` in the Supabase SQL Editor.
      3. Enter your Project URL and Anon Key in `config.js`.
 
+4. **Configuring Google OAuth (@kdu.ac.lk SSO) in Supabase (Optional):**
+   * If using Google SSO, enable the Google provider in your Supabase project:
+     1. Open **Supabase Dashboard** → **Authentication** → **Providers** → **Google**.
+     2. Enable the Google provider toggle.
+     3. Create an **OAuth 2.0 Client ID** in [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
+     4. Set Authorized redirect URI to: `https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/auth/v1/callback`.
+     5. Paste your **Google Client ID** and **Client Secret** into Supabase and save.
+   * *Note:* If Google OAuth is not configured in Supabase, the app will automatically inform the user and fallback to the built-in Email & Password sign-in form.
+
 ---
 
 ## 🔮 Future Enhancements

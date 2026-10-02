@@ -334,8 +334,10 @@ function initAuthPage() {
         buttonEl.disabled = false;
         buttonEl.innerHTML = originalText;
       }
-      if (typeof err === "string" && err.toLowerCase().includes("provider is not enabled")) {
+      if (typeof err === "string" && (err.toLowerCase().includes("provider is not enabled") || err.toLowerCase().includes("not enabled"))) {
         showToast("Google Login is not enabled in your Supabase project yet. Please use the Email & Password form below.", true);
+        const emailInput = $("#signin-email") || $("#reg-email");
+        if (emailInput) setTimeout(function () { emailInput.focus(); }, 300);
       } else {
         showToast(err, true);
       }
