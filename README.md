@@ -86,6 +86,8 @@ $$S_{\text{course}}(a, b) = \frac{|\mathcal{C}_a \cap \mathcal{C}_b|}{\min(|\mat
 * **Why Min-Normalization?**  
   Standard Jaccard ($\frac{|\mathcal{C}_a \cap \mathcal{C}_b|}{|\mathcal{C}_a \cup \mathcal{C}_b|}$) penalizes students with unequal course loads. For instance, if Student A is taking 2 repeat modules and shares both with Student B (who takes 5 modules), standard Jaccard gives $\frac{2}{5} = 40\%$. Min-normalization gives $\frac{2}{\min(2, 5)} = \frac{2}{2} = 100\%$, correctly reflecting that all of Student A's coursework overlaps with Student B.
 
+  *(For in-depth mathematical proofs on cardinality behavior—such as why 1 shared module and 5 shared modules both yield 60% under zero availability overlap—see [ALGORITHM_MODULE_MATCHING_ANALYSIS.md](ALGORITHM_MODULE_MATCHING_ANALYSIS.md) and [ALGORITHM_60_40_RATIONALE.md](ALGORITHM_60_40_RATIONALE.md).)*
+
 ### 2. Availability Overlap ($S_{\text{avail}}$) — 40% Weight
 Timetable synchronization ensures that matched students actually share mutually free times to study:
 
