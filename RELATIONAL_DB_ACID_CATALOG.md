@@ -66,7 +66,7 @@ KDU StudyConnect utilizes PostgreSQL's relational engine to maintain strict ACID
   `unique` constraints on faculty codes and names prevent duplicate registry entries.
 * **Check Constraints & Triggers:**
   * Domain restriction: `enforce_kdu_email_domain()` trigger verifies all signups end with `@kdu.ac.lk`.
-  * Syndicate size caps: `check (max_members between 2 and 20)` in `groups`.
+  * Syndicate size caps: `check (max_members between 2 and 5)` in `groups`.
   * Status validation: `check (status in ('pending', 'approved', 'rejected'))` in `join_requests`.
 * **Idempotent Upserts:**
   Catalog seed scripts use `ON CONFLICT (id) DO UPDATE SET ...` to prevent key collisions while updating catalog descriptions.

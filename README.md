@@ -98,34 +98,42 @@ Where $\mathcal{A}$ represents selected slots from the 21 possible weekly window
 ### Implementation in `app.js`
 
 ```javascript
-function calculateCompatibility(studentA, studentB) {
-  const coursesA = new Set(studentA.courses || []);
-  const coursesB = new Set(studentB.courses || []);
-  
-  // 1. Shared Course Modules
-  const sharedCourses = [...coursesA].filter(c => coursesB.has(c));
-  const minCourseCount = Math.min(coursesA.size, coursesB.size);
-  const courseScore = minCourseCount > 0 ? (sharedCourses.length / minCourseCount) : 0;
+function computeMatches(me) {
+  if (!me || !me.courses || !me.courses.length) return [];
+  const candidates = db().users.filter(function (u) {
+    return u.id !== me.id && u.role !== "admin" && profileComplete(u);
+  });
 
-  // 2. Shared Weekly Study Windows
-  const slotsA = new Set(studentA.availability || []);
-  const slotsB = new Set(studentB.availability || []);
-  const sharedSlots = [...slotsA].filter(s => slotsB.has(s));
-  const minSlotCount = Math.min(slotsA.size, slotsB.size);
-  const availScore = minSlotCount > 0 ? (sharedSlots.length / minSlotCount) : 0;
+  return candidates.map(function (other) {
+    const shared = sharedCourses(me, other);
+    // Strict Academic Requirement: Must share at least one course unit
+    if (!shared || shared.length === 0) return null;
 
-  // 3. 60/40 Weighted Composite Score
-  const totalScore = (0.6 * courseScore) + (0.4 * availScore);
+    const slots = commonSlots(me, other);
 
-  return {
-    score: Math.round(totalScore * 100),
-    courseScore: Math.round(courseScore * 100),
-    availScore: Math.round(availScore * 100),
-    sharedCourses: sharedCourses,
-    sharedSlots: sharedSlots,
-    overlapCount: sharedCourses.length,
-    slotOverlapCount: sharedSlots.length
-  };
+    // Normalizing by min() ensures fairness across students with varying module loads
+    const courseDenom = Math.max(1, Math.min(me.courses.length, other.courses.length));
+    const availDenom = Math.max(1, Math.min(me.availability.length, other.availability.length));
+
+    const courseScore = shared.length / courseDenom;
+    const availScore = slots.length / availDenom;
+
+    // Strict 60% Module overlap + 40% Schedule compatibility
+    // Cardinality bonus (+1% per shared module, capped at 4%) breaks ties for pairs with broader overlap
+    const cardinalityBonus = Math.min(0.04, shared.length * 0.01);
+    const finalScore = Math.min(1.0, (0.6 * courseScore) + (0.4 * availScore) + cardinalityBonus);
+
+    return {
+      user: other,
+      shared: shared,
+      slots: slots,
+      score: finalScore,
+      courseScore: courseScore,
+      availScore: availScore
+    };
+  })
+  .filter(function (m) { return m !== null && m.score > 0.05; })
+  .sort(function (a, b) { return b.score - a.score; });
 }
 ```
 
@@ -210,11 +218,12 @@ erDiagram
 | `study_sessions` | Scheduled study sessions with venue and time |
 | `join_requests` | Syndicate membership applications and approval status |
 
-### Row-Level Security (RLS)
+### Row-Level Security (RLS) & Database Integrity
 All primary tables enforce PostgreSQL Row-Level Security:
-* **Profiles:** Readable by authenticated students; editable only by the account owner.
+* **Profiles:** Readable by authenticated students; editable only by the account owner. A PostgreSQL trigger (`tr_protect_profile_role`) strictly prevents students from altering their account privilege role to `admin`.
+* **Group Members:** Students can only insert themselves if they are the syndicate creator (as `leader`) or possess an approved application in `join_requests` (`status = 'approved'`).
 * **Messages:** Only readable and insertable by verified members of that specific group.
-* **Join Requests:** Viewable by the group leader and the requesting student.
+* **Join Requests:** Viewable and updatable only by the group leader, the requesting student, and authorized moderators.
 * **Admin Privileges:** Users with `role = 'admin'` have moderation access across groups and users.
 
 ---

@@ -155,6 +155,9 @@ function computeMatches(me) {
 
   return candidates.map(function (other) {
     const shared = sharedCourses(me, other);
+    // Strict Academic Requirement: Study partners MUST share at least one course unit
+    if (!shared || shared.length === 0) return null;
+
     const slots = commonSlots(me, other);
 
     // Normalizing by min() ensures fairness across students with varying module loads
@@ -165,7 +168,9 @@ function computeMatches(me) {
     const availScore = slots.length / availDenom;
 
     // Strict 60% Module overlap + 40% Schedule compatibility
-    const finalScore = (0.6 * courseScore) + (0.4 * availScore);
+    // Cardinality bonus (+1% per shared module, capped at 4%) breaks ties for pairs with broader course overlap
+    const cardinalityBonus = Math.min(0.04, shared.length * 0.01);
+    const finalScore = Math.min(1.0, (0.6 * courseScore) + (0.4 * availScore) + cardinalityBonus);
 
     return {
       user: other,
@@ -176,7 +181,7 @@ function computeMatches(me) {
       availScore: availScore
     };
   })
-  .filter(function (m) { return m.score > 0.05; })
+  .filter(function (m) { return m !== null && m.score > 0.05; })
   .sort(function (a, b) { return b.score - a.score; });
 }
 
@@ -1052,6 +1057,12 @@ function initDashboardPage() {
   const user = requireLogin();
   if (!user) return;
 
+  if (!profileComplete(user)) {
+    showToast("Please complete your enrolled degree modules and study availability first.", true);
+    setTimeout(function () { location.href = "profile.html"; }, 700);
+    return;
+  }
+
   const typeInfo = getStudentType(user.indexNo);
   const fac = facultyById(user.facultyId);
   const dept = deptById(user.departmentId);
@@ -1536,7 +1547,7 @@ function initGroupsPage() {
     createSubmitBtn.addEventListener("click", async function () {
       const name = ($("#new-group-name")?.value || "").trim();
       const courseId = $("#new-group-course")?.value || null;
-      const maxMembers = $("#new-group-capacity")?.value || "6";
+      const maxMembers = $("#new-group-capacity")?.value || "5";
 
       if (!name) {
         showToast("Syndicate name is required.", true);
@@ -1677,15 +1688,19 @@ function initGroupDetailPage() {
       if (submitBtn) submitBtn.disabled = true;
     }
 
-    chatForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const text = chatInput.value.trim();
-      if (!text || !isMember) return;
+    if (!chatForm.dataset.bound) {
+      chatForm.dataset.bound = "true";
+      chatForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const text = chatInput.value.trim();
+        const currentGrp = groupById(groupId);
+        if (!text || !currentGrp || !currentGrp.members.includes(user.id)) return;
 
-      chatInput.value = "";
-      await sendMessage(groupId, user.id, text);
-      renderChat();
-    });
+        chatInput.value = "";
+        await sendMessage(groupId, user.id, text);
+        renderChat();
+      });
+    }
   }
 
   // Render Scheduled Sessions
@@ -1715,28 +1730,33 @@ function initGroupDetailPage() {
   const scheduleForm = $("#schedule-session-form");
   if (scheduleForm) {
     if (!isMember) scheduleForm.style.display = "none";
-    scheduleForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const title = ($("#new-session-title")?.value || "").trim();
-      const day = $("#new-session-day")?.value || "Wed";
-      const time = $("#new-session-time")?.value || "14:00";
+    if (!scheduleForm.dataset.bound) {
+      scheduleForm.dataset.bound = "true";
+      scheduleForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const title = ($("#new-session-title")?.value || "").trim();
+        const day = $("#new-session-day")?.value || "Wed";
+        const time = $("#new-session-time")?.value || "14:00";
 
-      if (!title) {
-        showToast("Please provide a session topic.", true);
-        return;
-      }
+        if (!title) {
+          showToast("Please provide a session topic.", true);
+          return;
+        }
 
-      await addStudySession(groupId, title, day, time);
-      showToast("Study session scheduled successfully!");
-      if ($("#new-session-title")) $("#new-session-title").value = "";
-      renderSessions();
-    });
+        await addStudySession(groupId, title, day, time);
+        showToast("Study session scheduled successfully!");
+        if ($("#new-session-title")) $("#new-session-title").value = "";
+        renderSessions();
+      });
+    }
   }
 
-  // Join Requests for Leader / Admin
-  const leaderReqsCard = $("#leader-requests-card");
-  const leaderReqsList = $("#leader-requests-list");
-  if (leaderReqsCard && leaderReqsList) {
+  // Render Join Requests for Leader / Admin
+  function renderLeaderRequests() {
+    const leaderReqsCard = $("#leader-requests-card");
+    const leaderReqsList = $("#leader-requests-list");
+    if (!leaderReqsCard || !leaderReqsList) return;
+
     if (isLeader || user.role === "admin") {
       leaderReqsCard.classList.remove("hidden");
       const pendingJoinReqs = db().requests.filter(function (r) {
@@ -1755,8 +1775,8 @@ function initGroupDetailPage() {
                 '</div>' +
               '</div>' +
               '<div class="flex items-center gap-1.5">' +
-                '<button type="button" class="btn-group-approve px-2.5 py-1 rounded-lg bg-primary text-on-primary text-xs font-semibold" data-id="' + r.id + '">Approve</button>' +
-                '<button type="button" class="btn-group-reject px-2.5 py-1 rounded-lg border border-outline-variant text-xs font-semibold" data-id="' + r.id + '">Reject</button>' +
+                '<button type="button" class="btn-group-approve px-2.5 py-1 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary-container transition-colors" data-id="' + r.id + '">Approve</button>' +
+                '<button type="button" class="btn-group-reject px-2.5 py-1 rounded-lg border border-outline-variant text-xs font-semibold hover:bg-surface-container transition-colors" data-id="' + r.id + '">Reject</button>' +
               '</div>' +
             '</div>';
           }).join("")
@@ -1766,28 +1786,40 @@ function initGroupDetailPage() {
     }
   }
 
-  document.addEventListener("click", async function (e) {
-    const btnApprove = e.target.closest(".btn-group-approve");
-    if (btnApprove) {
-      const rId = btnApprove.getAttribute("data-id");
-      const err = await approveJoinRequest(rId);
-      if (err) showToast(err, true);
-      else {
-        showToast("Cadet approved into syndicate!");
-        renderMembers();
-        initGroupDetailPage();
+  const leaderReqsList = $("#leader-requests-list");
+  if (leaderReqsList && !leaderReqsList.dataset.bound) {
+    leaderReqsList.dataset.bound = "true";
+    leaderReqsList.addEventListener("click", async function (e) {
+      const btnApprove = e.target.closest(".btn-group-approve");
+      if (btnApprove) {
+        const rId = btnApprove.getAttribute("data-id");
+        btnApprove.disabled = true;
+        const err = await approveJoinRequest(rId);
+        if (err) {
+          showToast(err, true);
+          btnApprove.disabled = false;
+        } else {
+          showToast("Cadet approved into syndicate!");
+          const currentGroup = groupById(groupId);
+          if (seatsEl && currentGroup) {
+            seatsEl.textContent = currentGroup.members.length + " / " + currentGroup.max_members + " Members";
+          }
+          renderMembers();
+          renderLeaderRequests();
+        }
+        return;
       }
-      return;
-    }
-    const btnReject = e.target.closest(".btn-group-reject");
-    if (btnReject) {
-      const rId = btnReject.getAttribute("data-id");
-      await setRequestStatus(rId, "rejected");
-      showToast("Join request rejected.");
-      initGroupDetailPage();
-      return;
-    }
-  });
+      const btnReject = e.target.closest(".btn-group-reject");
+      if (btnReject) {
+        const rId = btnReject.getAttribute("data-id");
+        btnReject.disabled = true;
+        await setRequestStatus(rId, "rejected");
+        showToast("Join request rejected.");
+        renderLeaderRequests();
+        return;
+      }
+    });
+  }
 
   // Realtime subscription
   if (groupChatSub && typeof groupChatSub.unsubscribe === "function") {
@@ -1797,9 +1829,17 @@ function initGroupDetailPage() {
     renderChat();
   });
 
+  window.addEventListener("pagehide", function () {
+    if (groupChatSub && typeof groupChatSub.unsubscribe === "function") {
+      groupChatSub.unsubscribe();
+      groupChatSub = null;
+    }
+  }, { once: true });
+
   renderMembers();
   renderChat();
   renderSessions();
+  renderLeaderRequests();
 }
 
 // ---------- Page Controller: Admin Moderation (admin.html) ----------

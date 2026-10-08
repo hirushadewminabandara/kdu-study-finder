@@ -73,7 +73,7 @@ create table if not exists public.groups (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   course_id int references public.courses(id),
-  max_members int not null default 6 check (max_members between 2 and 20),
+  max_members int not null default 5 check (max_members between 2 and 5),
   created_by uuid references public.profiles(id) on delete set null,
   is_open boolean not null default true,
   created_at timestamptz default now()
@@ -214,9 +214,27 @@ drop policy if exists "Allow authenticated read profiles" on public.profiles;
 create policy "Allow authenticated read profiles" on public.profiles
   for select using (auth.role() = 'authenticated');
 
+-- Security Trigger: Prevent non-admins from self-promoting to admin role
+create or replace function public.protect_profile_role()
+returns trigger language plpgsql security definer as $$
+begin
+  if new.role <> old.role and not exists (
+    select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'
+  ) then
+    raise exception 'Permission Denied: Students cannot alter their account role.';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists tr_protect_profile_role on public.profiles;
+create trigger tr_protect_profile_role
+before update on public.profiles
+for each row execute function public.protect_profile_role();
+
 drop policy if exists "Allow user to update own profile" on public.profiles;
 create policy "Allow user to update own profile" on public.profiles
-  for update using (auth.uid() = id);
+  for update using (auth.uid() = id) with check (auth.uid() = id);
 
 drop policy if exists "Allow user to insert own profile" on public.profiles;
 create policy "Allow user to insert own profile" on public.profiles
@@ -261,9 +279,36 @@ drop policy if exists "Allow read group members" on public.group_members;
 create policy "Allow read group members" on public.group_members
   for select using (auth.role() = 'authenticated');
 
+-- Enforce that members can only join if they are group creator (as leader) or have approved join request
 drop policy if exists "Allow join group members" on public.group_members;
 create policy "Allow join group members" on public.group_members
-  for insert with check (auth.uid() = student);
+  for insert with check (
+    auth.uid() = student and (
+      -- Group creator adding themselves as leader
+      (
+        role = 'leader' and exists (
+          select 1 from public.groups g
+          where g.id = group_members.group_id and g.created_by = auth.uid()
+        )
+      )
+      or
+      -- Student joining as member IF they have an approved join request
+      (
+        role = 'member' and exists (
+          select 1 from public.join_requests jr
+          where jr.group_id = group_members.group_id
+            and jr.student = auth.uid()
+            and jr.status = 'approved'
+        )
+      )
+      or
+      -- Platform Admin
+      exists (
+        select 1 from public.profiles p
+        where p.id = auth.uid() and p.role = 'admin'
+      )
+    )
+  );
 
 drop policy if exists "Allow leave group" on public.group_members;
 create policy "Allow leave group" on public.group_members

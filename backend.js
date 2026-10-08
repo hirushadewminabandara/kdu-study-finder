@@ -1038,7 +1038,7 @@ async function syncFromSupabase() {
           name: g.name,
           course: g.course_id ? Number(g.course_id) : null,
           leader: g.created_by,
-          max_members: g.max_members || 6,
+          max_members: g.max_members || 5,
           is_open: g.is_open !== false,
           members: members
         };
@@ -1444,39 +1444,47 @@ async function signIn(email, password) {
   if (sbClient) {
     try {
       const { data, error } = await sbClient.auth.signInWithPassword({ email: cleanEmail, password: password });
-      if (error) return error.message;
-      let user = userById(data.user.id) || userByEmail(cleanEmail);
-      if (!user) {
-        user = {
-          id: data.user.id,
-          name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || cleanEmail.split("@")[0],
-          email: cleanEmail,
-          indexNo: data.user.user_metadata?.index_no || "",
-          avatarUrl: data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture || "",
-          role: isAdminEmail(cleanEmail) ? "admin" : "student",
-          facultyId: null,
-          departmentId: null,
-          intake: "43",
-          year: 2,
-          courses: [],
-          availability: []
-        };
-        state.users.push(user);
-      } else if (isAdminEmail(cleanEmail)) {
-        user.role = "admin";
+      if (error) {
+        const msg = (error.message || "").toLowerCase();
+        const isNetworkFail = msg.includes("fetch") || msg.includes("network") || msg.includes("failed to fetch") || msg.includes("timeout") || msg.includes("502") || msg.includes("503") || msg.includes("504");
+        if (isNetworkFail) {
+          console.warn("Supabase network error, activating local demo fallback:", error);
+        } else {
+          return error.message;
+        }
+      } else {
+        let user = userById(data.user.id) || userByEmail(cleanEmail);
+        if (!user) {
+          user = {
+            id: data.user.id,
+            name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || cleanEmail.split("@")[0],
+            email: cleanEmail,
+            indexNo: data.user.user_metadata?.index_no || "",
+            avatarUrl: data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture || "",
+            role: isAdminEmail(cleanEmail) ? "admin" : "student",
+            facultyId: null,
+            departmentId: null,
+            intake: "43",
+            year: 2,
+            courses: [],
+            availability: []
+          };
+          state.users.push(user);
+        } else if (isAdminEmail(cleanEmail)) {
+          user.role = "admin";
+        }
+        state.authUser = user;
+        sessionStorage.setItem("kdu_active_user_id", user.id);
+        saveStateToStorage();
+        await syncFromSupabase();
+        return null;
       }
-      state.authUser = user;
-      sessionStorage.setItem("kdu_active_user_id", user.id);
-      saveStateToStorage();
-      await syncFromSupabase();
-      return null;
     } catch (e) {
-      console.warn("Supabase live signIn notice:", e);
-      return e.message || "Failed to sign in.";
+      console.warn("Supabase live signIn exception, activating local demo fallback:", e);
     }
   }
 
-  // 2. Local fallback if Supabase not configured
+  // 2. Local fallback if Supabase not configured or network unavailable
   const existing = userByEmail(cleanEmail);
   if (!existing) {
     return "Account not found with this email. Please register your @kdu.ac.lk account first.";
@@ -1530,13 +1538,19 @@ async function signUp(name, indexNo, email, password, facultyId, departmentId, i
           emailRedirectTo: redirectUrl
         }
       });
-      if (error) return error.message;
-      if (data && data.user) {
+      if (error) {
+        const msg = (error.message || "").toLowerCase();
+        const isNetworkFail = msg.includes("fetch") || msg.includes("network") || msg.includes("failed to fetch") || msg.includes("timeout") || msg.includes("502") || msg.includes("503");
+        if (isNetworkFail) {
+          console.warn("Supabase registration unreachable, creating account in local demo mode:", error);
+        } else {
+          return error.message;
+        }
+      } else if (data && data.user) {
         newId = data.user.id;
       }
     } catch (e) {
-      console.warn("Supabase live signUp notice:", e);
-      return e.message || "Failed to register account with Supabase.";
+      console.warn("Supabase live signUp network error, activating local mode:", e);
     }
   }
 
@@ -1751,21 +1765,21 @@ async function sendMessage(groupId, senderId, text) {
 
   if (sbClient) {
     try {
-      // 1. Instant cloud broadcast across tabs & connected clients
-      const ch = sbClient.channel("group-" + groupId);
-      ch.send({
-        type: "broadcast",
-        event: "chat_message",
-        payload: msgObj
-      }).catch(function () {});
-
-      // 2. Persist to Supabase if group and sender are valid UUIDs
       if (isValidUUID(groupId) && isValidUUID(senderId)) {
+        // Persist to Supabase; postgres_changes will propagate officially to peers
         await sbClient.from("messages").insert({
           group_id: groupId,
           sender: senderId,
           content: clean
         });
+      } else {
+        // Broadcast across tabs/clients only for demo non-UUID groups
+        const ch = sbClient.channel("group-" + groupId);
+        ch.send({
+          type: "broadcast",
+          event: "chat_message",
+          payload: msgObj
+        }).catch(function () {});
       }
     } catch (e) {
       console.warn("Supabase message send notice:", e);
@@ -1883,7 +1897,7 @@ async function approveJoinRequest(requestId) {
 
 async function acceptPartnerRequest(requestId) {
   const r = state.requests.find(function (x) { return x.id === requestId; });
-  if (!r || r.status !== "pending") return "Request not found.";
+  if (!r || r.status !== "pending") return "Study request not found or already handled.";
   const me = state.authUser;
   const other = userById(r.from);
   if (!me || !other) return "User account not found.";
@@ -1892,22 +1906,52 @@ async function acceptPartnerRequest(requestId) {
     return (other.courses || []).includes(id);
   });
 
-  const courseTitle = shared.length ? courseById(shared[0])?.code + " " : "";
+  const courseTitle = shared.length ? (courseById(shared[0])?.code + " ") : "";
   const groupName = courseTitle + me.name.split(" ")[0] + " & " + other.name.split(" ")[0] + " Syndicate";
 
-  return await createGroup(groupName, shared.length ? shared[0] : null, 4, me.id);
+  const groupResult = await createGroup(groupName, shared.length ? shared[0] : null, 5, me.id);
+  if (typeof groupResult === "string") {
+    return groupResult;
+  }
+
+  // Add the partner (other user) to the newly created syndicate
+  if (!groupResult.members.includes(other.id)) {
+    groupResult.members.push(other.id);
+  }
+  r.status = "approved";
+  saveStateToStorage();
+
+  if (sbClient) {
+    try {
+      if (isValidUUID(groupResult.id) && isValidUUID(other.id)) {
+        await sbClient.from("group_members").insert({
+          group_id: groupResult.id,
+          student: other.id,
+          role: "member"
+        });
+      }
+      if (r.rawId) {
+        await sbClient.from("join_requests").update({ status: "approved" }).eq("id", r.rawId);
+      }
+    } catch (e) {
+      console.warn("Supabase accept partner sync notice:", e);
+    }
+  }
+
+  return null;
 }
 
 async function createGroup(name, courseId, maxMembers, leaderId) {
   if (!name.trim()) return "Group name is required.";
   let groupId = "grp-" + Date.now();
+  const cappedMembers = Math.max(2, Math.min(5, Number(maxMembers) || 5));
 
   if (sbClient) {
     try {
       const { data: ins, error } = await sbClient.from("groups").insert({
         name: name.trim(),
         course_id: courseId ? Number(courseId) : null,
-        max_members: Math.max(2, Math.min(10, Number(maxMembers) || 6)),
+        max_members: cappedMembers,
         created_by: leaderId,
         is_open: true
       }).select().single();
@@ -1930,7 +1974,7 @@ async function createGroup(name, courseId, maxMembers, leaderId) {
     name: name.trim(),
     course: courseId ? Number(courseId) : null,
     leader: leaderId,
-    max_members: Math.max(2, Math.min(10, Number(maxMembers) || 6)),
+    max_members: cappedMembers,
     is_open: true,
     members: [leaderId]
   };
@@ -2014,24 +2058,39 @@ function subscribeToMessages(groupId, onMessageReceived) {
           if (payload && payload.new) {
             if (!state) db();
             const list = state.messages[groupId] || (state.messages[groupId] = []);
-            if (!list.some(function (m) { return m.id === payload.new.id; })) {
+            const newAt = new Date(payload.new.sent_at).getTime();
+            // Check if already in list by id or by same sender, text, and within 10s (optimistic match)
+            const matchIdx = list.findIndex(function (m) {
+              return m.id === payload.new.id ||
+                (m.sender === payload.new.sender && m.text === payload.new.content && Math.abs(m.at - newAt) < 10000);
+            });
+            if (matchIdx >= 0) {
+              // Update optimistic message with authoritative database id and timestamp
+              list[matchIdx].id = payload.new.id;
+              list[matchIdx].at = newAt;
+            } else {
               list.push({
                 id: payload.new.id,
                 sender: payload.new.sender,
                 text: payload.new.content,
-                at: new Date(payload.new.sent_at).getTime()
+                at: newAt
               });
-              saveStateToStorage();
-              onMessageReceived();
             }
+            saveStateToStorage();
+            onMessageReceived();
           }
         })
         .on("broadcast", { event: "chat_message" }, function (payload) {
           if (payload && payload.payload) {
+            // If group is a persisted Supabase group, postgres_changes is authoritative
+            if (sbClient && isValidUUID(groupId)) return;
             if (!state) db();
             const m = payload.payload;
             const list = state.messages[groupId] || (state.messages[groupId] = []);
-            if (!list.some(function (item) { return item.id === m.id; })) {
+            const exists = list.some(function (item) {
+              return item.id === m.id || (item.sender === m.sender && item.text === m.text && Math.abs(item.at - m.at) < 5000);
+            });
+            if (!exists) {
               list.push(m);
               saveStateToStorage();
               onMessageReceived();

@@ -91,8 +91,11 @@ function calculateCompatibility(studentA, studentB) {
   const coursesB = new Set(studentB.courses || []);
   const sharedCourses = [...coursesA].filter(c => coursesB.has(c));
 
-  const minCourses = Math.min(coursesA.size, coursesB.size);
-  const courseScore = minCourses > 0 ? sharedCourses.length / minCourses : 0;
+  // Strict Academic Prerequisite: 0 course overlap = 0 academic utility
+  if (sharedCourses.length === 0) return null;
+
+  const minCourses = Math.max(1, Math.min(coursesA.size, coursesB.size));
+  const courseScore = sharedCourses.length / minCourses;
 
   const availA = new Set(studentA.availability || []);
   const availB = new Set(studentB.availability || []);
@@ -101,7 +104,16 @@ function calculateCompatibility(studentA, studentB) {
   const minAvail = Math.max(1, Math.min(availA.size, availB.size));
   const availScore = sharedAvail.length / minAvail;
 
-  const totalScore = Math.round((courseScore * 0.60 + availScore * 0.40) * 100);
-  return { score: totalScore, sharedCourses, sharedAvail };
+  // Cardinality bonus (+1% per shared course up to 4%) breaks ties for broader syllabus coverage
+  const cardinalityBonus = Math.min(0.04, sharedCourses.length * 0.01);
+  const compositeScore = Math.min(1.0, (0.60 * courseScore) + (0.40 * availScore) + cardinalityBonus);
+
+  return {
+    score: Math.round(compositeScore * 100),
+    sharedCourses,
+    sharedAvail,
+    courseScore: Math.round(courseScore * 100),
+    availScore: Math.round(availScore * 100)
+  };
 }
 ```

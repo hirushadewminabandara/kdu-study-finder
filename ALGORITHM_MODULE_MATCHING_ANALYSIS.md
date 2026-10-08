@@ -178,8 +178,10 @@ Assuming zero timetable availability overlap ($S_{\text{avail}} = 0$):
 
 ---
 
-## 7. Conclusion
+## 7. Conclusion & Production Implementation
 
 * **Why it happens:** The algorithm divides by $\min(|\mathcal{C}_A|, |\mathcal{C}_B|)$, making $1/1 = 1.0$ and $5/5 = 1.0$. Multiplied by the 60% course weight, both produce 60%.
 * **Why it was intended:** To protect students with low module loads (repeats, electives) from being unfairly penalized by standard Jaccard denominators.
-* **The solution:** Implementing the **Balanced Hybrid Index** ($\text{Min-Norm} + \text{Jaccard}$) gracefully preserves fairness for asymmetric course loads while appropriately rewarding students who share their full semester curriculum.
+* **Production Resolution (Implemented):** In the production engine ([`app.js`](app.js#L150-L185)), two key enhancements are active:
+  1. **Strict Course Prerequisite:** If shared module count is zero ($|\mathcal{C}_A \cap \mathcal{C}_B| = 0$), candidates are strictly excluded from matching.
+  2. **Micro Cardinality Bonus:** A $+1\%$ bonus per shared course (capped at $+4\%$) breaks ties to naturally rank students with broader mutual coursework above single-module overlaps.
