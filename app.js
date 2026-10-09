@@ -207,32 +207,32 @@ function renderHeader(activePageKey) {
 
     navItemsHtml = links.map(function (item) {
       const isActive = item.key === activePageKey;
-      return '<a href="' + item.href + '" class="h-full flex items-center gap-2 px-3 transition-colors ' +
+      return '<a href="' + item.href + '" class="h-full flex items-center gap-2 px-3 text-sm font-medium whitespace-nowrap shrink-0 transition-colors border-b-2 ' +
         (isActive
-          ? 'text-primary font-bold border-b-2 border-primary'
-          : 'text-on-surface-variant hover:text-primary font-medium') + '">' +
+          ? 'text-primary font-bold border-primary'
+          : 'text-on-surface-variant hover:text-primary hover:border-outline-variant border-transparent') + '">' +
         item.label +
-        (item.isStaff ? '<span class="px-1.5 py-0.5 rounded text-[10px] uppercase font-bold bg-secondary text-on-secondary">Staff</span>' : '') +
+        (item.isStaff ? '<span class="px-1.5 py-0.5 rounded text-[10px] uppercase font-bold bg-secondary text-on-secondary shrink-0">Staff</span>' : '') +
         '</a>';
     }).join("");
   }
 
   header.className = "fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-outline-variant shadow-sm";
   header.innerHTML =
-    '<div class="h-16 max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">' +
-      '<div class="flex items-center gap-6">' +
-        '<a href="' + (user ? "dashboard.html" : "index.html") + '" class="flex items-center gap-3 group">' +
-          '<img src="img/kdu-logo.png" alt="KDU Crest" class="w-10 h-10 object-contain group-hover:scale-105 transition-transform">' +
-          '<div class="flex flex-col">' +
+    '<div class="h-16 max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">' +
+      '<div class="flex items-center gap-6 shrink-0">' +
+        '<a href="' + (user ? "dashboard.html" : "index.html") + '" class="flex items-center gap-3 shrink-0 group">' +
+          '<img src="img/kdu-logo.png" alt="KDU Crest" class="w-10 h-10 object-contain group-hover:scale-105 transition-transform shrink-0">' +
+          '<div class="flex flex-col shrink-0">' +
             '<span class="font-headline-sm text-primary font-bold leading-tight">KDU StudyConnect</span>' +
             '<span class="text-[11px] uppercase tracking-wider text-on-surface-variant font-medium">Kotelawala Defence University</span>' +
           '</div>' +
         '</a>' +
-        '<nav class="hidden md:flex items-center h-16 ml-4">' + navItemsHtml + '</nav>' +
+        '<nav class="hidden md:flex items-center h-16 gap-2 shrink-0">' + navItemsHtml + '</nav>' +
       '</div>' +
-      '<div class="flex items-center gap-4">' +
+      '<div class="flex items-center gap-4 shrink-0">' +
         (user
-          ? '<div class="flex items-center gap-3">' +
+          ? '<div class="flex items-center gap-3 shrink-0">' +
               avatarHtml(user.name, 36, user.avatarUrl) +
               '<div class="hidden sm:flex flex-col text-left">' +
                 '<div class="flex items-center gap-2">' +
@@ -241,11 +241,11 @@ function renderHeader(activePageKey) {
                 '</div>' +
                 '<span class="text-xs text-on-surface-variant font-mono">' + esc(user.indexNo || "") + ' · Intake ' + (user.intake || "43") + '</span>' +
               '</div>' +
-              '<button id="btn-signout" type="button" class="ml-2 px-3 py-1.5 rounded-lg border border-outline-variant hover:bg-surface-container text-xs font-semibold text-on-surface transition-colors">' +
+              '<button id="btn-signout" type="button" class="ml-2 px-3 py-1.5 rounded-lg border border-outline-variant hover:bg-surface-container text-xs font-semibold text-on-surface transition-colors shrink-0">' +
                 'Sign out' +
               '</button>' +
             '</div>'
-          : '<a href="index.html" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md text-xs font-semibold hover:bg-primary-container transition-colors">Portal Login</a>') +
+          : '<a href="index.html" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md text-xs font-semibold hover:bg-primary-container transition-colors shrink-0">Portal Login</a>') +
       '</div>' +
     '</div>' +
     '<div class="h-[2px] w-full bg-secondary"></div>';
