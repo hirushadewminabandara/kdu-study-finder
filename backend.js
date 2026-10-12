@@ -1774,21 +1774,41 @@ async function sendMessage(groupId, senderId, text) {
 
   if (sbClient) {
     try {
-      if (isValidUUID(groupId) && isValidUUID(senderId)) {
-        // Persist to Supabase; postgres_changes will propagate officially to peers
-        await sbClient.from("messages").insert({
-          group_id: groupId,
-          sender: senderId,
-          content: clean
+      // 1. Broadcast in Realtime so all open client tabs/peers in this syndicate receive it immediately
+      const channelName = "group-" + groupId;
+      let ch = (activeRealtimeChannel && activeRealtimeGroupId === groupId) ? activeRealtimeChannel : null;
+      if (!ch) {
+        ch = sbClient.channel(channelName, {
+          config: { broadcast: { self: false } }
+        });
+        ch.subscribe(function (status) {
+          if (status === "SUBSCRIBED") {
+            ch.send({
+              type: "broadcast",
+              event: "chat_message",
+              payload: msgObj
+            }).catch(function () {});
+          }
         });
       } else {
-        // Broadcast across tabs/clients only for demo non-UUID groups
-        const ch = sbClient.channel("group-" + groupId);
         ch.send({
           type: "broadcast",
           event: "chat_message",
           payload: msgObj
-        }).catch(function () {});
+        }).catch(function (e) {
+          console.warn("Realtime broadcast send notice:", e);
+        });
+      }
+
+      // 2. If valid UUIDs, persist to Supabase PostgreSQL table
+      if (isValidUUID(groupId) && isValidUUID(senderId)) {
+        sbClient.from("messages").insert({
+          group_id: groupId,
+          sender: senderId,
+          content: clean
+        }).then(function () {}, function (err) {
+          console.warn("Supabase messages insert notice:", err);
+        });
       }
     } catch (e) {
       console.warn("Supabase message send notice:", e);
@@ -1899,6 +1919,41 @@ async function approveJoinRequest(requestId) {
       }
     } catch (e) {
       console.warn("Supabase approve request notice:", e);
+    }
+  }
+  return null;
+}
+
+async function joinGroup(groupId, userId) {
+  if (!state) db();
+  const g = groupById(groupId);
+  if (!g) return "Syndicate not found.";
+  if (!g.members) g.members = [];
+  if (g.members.includes(userId)) return null;
+
+  const max = g.max_members || 5;
+  if (g.members.length >= max && g.id !== "grp-sdp2-group-10") {
+    return "This syndicate has reached its maximum capacity (" + max + " members).";
+  }
+
+  g.members.push(userId);
+  if (g.members.length >= max && g.id !== "grp-sdp2-group-10") {
+    g.is_open = false;
+  }
+  saveStateToStorage();
+
+  if (sbClient && isValidUUID(groupId) && isValidUUID(userId)) {
+    try {
+      await sbClient.from("group_members").insert({
+        group_id: groupId,
+        student: userId,
+        role: "member"
+      });
+      if (g.members.length >= max) {
+        await sbClient.from("groups").update({ is_open: false }).eq("id", groupId);
+      }
+    } catch (e) {
+      console.warn("Supabase joinGroup notice:", e);
     }
   }
   return null;
@@ -2053,11 +2108,23 @@ async function setGroupOpenStatus(groupId, isOpen) {
 
 // ---------- Realtime Subscription ----------
 
+let activeRealtimeChannel = null;
+let activeRealtimeGroupId = null;
+
 function subscribeToMessages(groupId, onMessageReceived) {
+  if (activeRealtimeChannel && activeRealtimeGroupId !== groupId && sbClient) {
+    try { sbClient.removeChannel(activeRealtimeChannel); } catch (e) {}
+    activeRealtimeChannel = null;
+  }
+  activeRealtimeGroupId = groupId;
+
   let sbSub = null;
   if (sbClient) {
     try {
-      sbSub = sbClient.channel("group-" + groupId)
+      const channelName = "group-" + groupId;
+      sbSub = sbClient.channel(channelName, {
+        config: { broadcast: { self: false } }
+      })
         .on("postgres_changes", {
           event: "INSERT",
           schema: "public",
@@ -2091,8 +2158,6 @@ function subscribeToMessages(groupId, onMessageReceived) {
         })
         .on("broadcast", { event: "chat_message" }, function (payload) {
           if (payload && payload.payload) {
-            // If group is a persisted Supabase group, postgres_changes is authoritative
-            if (sbClient && isValidUUID(groupId)) return;
             if (!state) db();
             const m = payload.payload;
             const list = state.messages[groupId] || (state.messages[groupId] = []);
@@ -2107,6 +2172,8 @@ function subscribeToMessages(groupId, onMessageReceived) {
           }
         })
         .subscribe();
+
+      activeRealtimeChannel = sbSub;
     } catch (e) {
       console.warn("Realtime channel failed, falling back to local:", e);
     }
@@ -2115,7 +2182,9 @@ function subscribeToMessages(groupId, onMessageReceived) {
   // Local storage broadcast listener for multi-tab testing
   function handleStorage(e) {
     if (e.key === STORAGE_KEY) {
+      const curAuth = state ? state.authUser : null;
       state = loadStateFromStorage();
+      if (curAuth) state.authUser = curAuth;
       onMessageReceived();
     }
   }
@@ -2125,6 +2194,10 @@ function subscribeToMessages(groupId, onMessageReceived) {
     unsubscribe: function () {
       if (sbSub && sbClient) {
         try { sbClient.removeChannel(sbSub); } catch (e) {}
+      }
+      if (activeRealtimeChannel === sbSub) {
+        activeRealtimeChannel = null;
+        activeRealtimeGroupId = null;
       }
       window.removeEventListener("storage", handleStorage);
     }

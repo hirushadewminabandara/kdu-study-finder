@@ -1592,7 +1592,7 @@ function initGroupDetailPage() {
   }
 
   const course = courseById(group.course);
-  const isMember = group.members.includes(user.id);
+  let isMember = (group.members && group.members.includes(user.id)) || user.role === "admin";
   const isLeader = group.leader === user.id;
 
   // Header Details
@@ -1605,20 +1605,75 @@ function initGroupDetailPage() {
   }
 
   const seatsEl = $("#group-seats-badge");
-  if (seatsEl) {
-    seatsEl.textContent = group.members.length + " / " + group.max_members + " Members";
+
+  function updateMembershipUI() {
+    const curGroup = groupById(groupId) || group;
+    isMember = (curGroup.members && curGroup.members.includes(user.id)) || user.role === "admin";
+
+    if (seatsEl) {
+      seatsEl.textContent = curGroup.members.length + " / " + curGroup.max_members + " Members";
+    }
+
+    const btnJoin = $("#btn-join-group");
+    const guestBanner = $("#chat-guest-banner");
+    const cInput = $("#chat-input");
+    const submitBtn = $("#chat-form button[type='submit']");
+
+    if (isMember) {
+      if (btnJoin) btnJoin.classList.add("hidden");
+      if (guestBanner) guestBanner.classList.add("hidden");
+      if (cInput) {
+        cInput.disabled = false;
+        cInput.placeholder = "Type a message to your study syndicate...";
+      }
+      if (submitBtn) submitBtn.disabled = false;
+    } else {
+      if (btnJoin) btnJoin.classList.remove("hidden");
+      if (guestBanner) guestBanner.classList.remove("hidden");
+      if (cInput) {
+        cInput.disabled = true;
+        cInput.placeholder = "Join this syndicate to send messages.";
+      }
+      if (submitBtn) submitBtn.disabled = true;
+    }
+  }
+
+  async function handleJoinSyndicate() {
+    const err = await joinGroup(groupId, user.id);
+    if (err) {
+      showToast(err, true);
+      return;
+    }
+    showToast("Joined syndicate successfully! You can now participate in discussions.");
+    renderMembers();
+    updateMembershipUI();
+    const cInput = $("#chat-input");
+    if (cInput) cInput.focus();
+  }
+
+  const btnJoinHeader = $("#btn-join-group");
+  if (btnJoinHeader && !btnJoinHeader.dataset.bound) {
+    btnJoinHeader.dataset.bound = "true";
+    btnJoinHeader.addEventListener("click", handleJoinSyndicate);
+  }
+
+  const btnGuestJoin = $("#btn-guest-join-chat");
+  if (btnGuestJoin && !btnGuestJoin.dataset.bound) {
+    btnGuestJoin.dataset.bound = "true";
+    btnGuestJoin.addEventListener("click", handleJoinSyndicate);
   }
 
   // Render Member Roster
   function renderMembers() {
     const rosterEl = $("#group-members-list");
     if (!rosterEl) return;
+    const curGroup = groupById(groupId) || group;
 
-    rosterEl.innerHTML = group.members.map(function (mid) {
+    rosterEl.innerHTML = curGroup.members.map(function (mid) {
       const mUser = userById(mid);
       if (!mUser) return "";
       const mType = getStudentType(mUser.indexNo);
-      const isThisLeader = mid === group.leader;
+      const isThisLeader = mid === curGroup.leader;
 
       return '<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest border border-outline-variant">' +
         '<div class="flex items-center gap-3">' +
@@ -1681,12 +1736,7 @@ function initGroupDetailPage() {
   const chatForm = $("#chat-form");
   const chatInput = $("#chat-input");
   if (chatForm && chatInput) {
-    if (!isMember) {
-      chatInput.disabled = true;
-      chatInput.placeholder = "Join this syndicate to send messages.";
-      const submitBtn = chatForm.querySelector("button[type='submit']");
-      if (submitBtn) submitBtn.disabled = true;
-    }
+    updateMembershipUI();
 
     if (!chatForm.dataset.bound) {
       chatForm.dataset.bound = "true";
@@ -1694,11 +1744,20 @@ function initGroupDetailPage() {
         e.preventDefault();
         const text = chatInput.value.trim();
         const currentGrp = groupById(groupId);
-        if (!text || !currentGrp || !currentGrp.members.includes(user.id)) return;
+        const canSend = currentGrp && (currentGrp.members.includes(user.id) || user.role === "admin");
+        if (!text) return;
+        if (!canSend) {
+          showToast("Please join this syndicate before sending messages.", true);
+          return;
+        }
 
         chatInput.value = "";
-        await sendMessage(groupId, user.id, text);
+        const err = await sendMessage(groupId, user.id, text);
+        if (err) {
+          showToast(err, true);
+        }
         renderChat();
+        chatInput.focus();
       });
     }
   }
@@ -1840,6 +1899,7 @@ function initGroupDetailPage() {
   renderChat();
   renderSessions();
   renderLeaderRequests();
+  updateMembershipUI();
 }
 
 // ---------- Page Controller: Admin Moderation (admin.html) ----------

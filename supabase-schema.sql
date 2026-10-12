@@ -285,34 +285,42 @@ drop policy if exists "Allow read group members" on public.group_members;
 create policy "Allow read group members" on public.group_members
   for select using (auth.role() = 'authenticated');
 
--- Enforce that members can only join if they are group creator (as leader) or have approved join request
+-- Enforce that members can join group or be added by leader/admin
 drop policy if exists "Allow join group members" on public.group_members;
 create policy "Allow join group members" on public.group_members
   for insert with check (
-    auth.uid() = student and (
-      -- Group creator adding themselves as leader
-      (
-        role = 'leader' and exists (
+    -- Group creator adding themselves as leader or student joining open group
+    (
+      auth.uid() = student and (
+        (role = 'leader' and exists (
           select 1 from public.groups g
           where g.id = group_members.group_id and g.created_by = auth.uid()
-        )
-      )
-      or
-      -- Student joining as member IF they have an approved join request
-      (
-        role = 'member' and exists (
+        ))
+        or
+        (role = 'member' and exists (
+          select 1 from public.groups g
+          where g.id = group_members.group_id and g.is_open = true
+        ))
+        or
+        (role = 'member' and exists (
           select 1 from public.join_requests jr
           where jr.group_id = group_members.group_id
             and jr.student = auth.uid()
             and jr.status = 'approved'
-        )
+        ))
       )
-      or
-      -- Platform Admin
-      exists (
-        select 1 from public.profiles p
-        where p.id = auth.uid() and p.role = 'admin'
-      )
+    )
+    or
+    -- Group Leader adding approved student member
+    exists (
+      select 1 from public.groups g
+      where g.id = group_members.group_id and g.created_by = auth.uid()
+    )
+    or
+    -- Platform Admin
+    exists (
+      select 1 from public.profiles p
+      where p.id = auth.uid() and p.role = 'admin'
     )
   );
 
@@ -359,16 +367,23 @@ create policy "Allow members to read group messages" on public.messages
     exists (
       select 1 from public.group_members gm
       where gm.group_id = messages.group_id and gm.student = auth.uid()
+    ) or
+    exists (
+      select 1 from public.profiles p
+      where p.id = auth.uid() and p.role = 'admin'
     )
   );
 
 drop policy if exists "Allow members to insert group messages" on public.messages;
 create policy "Allow members to insert group messages" on public.messages
   for insert with check (
-    auth.uid() = sender and
-    exists (
+    (auth.uid() = sender and exists (
       select 1 from public.group_members gm
       where gm.group_id = messages.group_id and gm.student = auth.uid()
+    )) or
+    exists (
+      select 1 from public.profiles p
+      where p.id = auth.uid() and p.role = 'admin'
     )
   );
 

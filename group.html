@@ -79,6 +79,10 @@
               <span id="group-seats-badge" class="px-2.5 py-0.5 rounded bg-surface-container-high text-on-surface text-xs font-semibold">
                 0 / 5 Members
               </span>
+              <button id="btn-join-group" type="button" class="hidden h-7 px-3 bg-primary text-on-primary rounded-lg text-xs font-bold hover:bg-primary-container transition-colors shadow-sm flex items-center gap-1 cursor-pointer">
+                <span class="material-symbols-outlined text-[15px]">group_add</span>
+                <span>Join Syndicate</span>
+              </button>
             </div>
             <h1 id="group-title" class="text-2xl font-bold text-primary tracking-tight">
               Syndicate Name
@@ -106,6 +110,18 @@
           <!-- Chat Messages Scroll Container -->
           <div id="chat-messages-container" class="flex-grow overflow-y-auto pr-2 space-y-3">
             <!-- Messages rendered dynamically -->
+          </div>
+
+          <!-- Guest / Non-Member Notice Banner -->
+          <div id="chat-guest-banner" class="hidden mt-3 p-3 rounded-xl bg-surface-container border border-outline-variant flex items-center justify-between text-xs text-on-surface">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px] text-secondary">info</span>
+              <span>You are viewing this syndicate as a guest. Join to send messages.</span>
+            </div>
+            <button type="button" id="btn-guest-join-chat" class="px-3 py-1.5 bg-primary text-on-primary font-bold rounded-lg hover:bg-primary-container transition-colors flex items-center gap-1 shadow-sm cursor-pointer">
+              <span class="material-symbols-outlined text-[14px]">group_add</span>
+              <span>Join Syndicate</span>
+            </button>
           </div>
 
           <!-- Chat Input Form -->
