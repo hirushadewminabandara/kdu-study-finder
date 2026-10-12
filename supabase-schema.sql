@@ -156,7 +156,10 @@ begin
       ''
     ),
     case
-      when new.email ilike 'admin%' or new.email ilike 'staff%' or lower(new.email) = '43-ict-0042@kdu.ac.lk' then 'admin'
+      when new.email ilike 'admin%' 
+        or new.email ilike 'staff%' 
+        or lower(new.email) in ('43-ict-0042@kdu.ac.lk', 'bandara.nrhd@kdu.ac.lk', '43-ict-0028@kdu.ac.lk', 'nethmini.was@kdu.ac.lk')
+        or upper(coalesce(new.raw_user_meta_data->>'index_no', '')) in ('D/ICT/26/0042', 'D/ICT/26/0028') then 'admin'
       else 'student'
     end
   )
@@ -168,7 +171,10 @@ begin
       else public.profiles.avatar_url
     end,
     role = case
-      when excluded.email ilike 'admin%' or excluded.email ilike 'staff%' or lower(excluded.email) = '43-ict-0042@kdu.ac.lk' then 'admin'
+      when excluded.email ilike 'admin%' 
+        or excluded.email ilike 'staff%' 
+        or lower(excluded.email) in ('43-ict-0042@kdu.ac.lk', 'bandara.nrhd@kdu.ac.lk', '43-ict-0028@kdu.ac.lk', 'nethmini.was@kdu.ac.lk')
+        or upper(coalesce(new.raw_user_meta_data->>'index_no', '')) in ('D/ICT/26/0042', 'D/ICT/26/0028') then 'admin'
       else public.profiles.role
     end,
     display_name = case
